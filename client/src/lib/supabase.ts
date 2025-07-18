@@ -5,21 +5,36 @@ export const getSupabaseClient = async () => {
   try {
     const response = await fetch('/api/config');
     const config = await response.json();
+    
+    if (!config.VITE_SUPABASE_URL || !config.VITE_SUPABASE_ANON_KEY) {
+      throw new Error('Supabase configuration not found');
+    }
+    
     return createClient(config.VITE_SUPABASE_URL, config.VITE_SUPABASE_ANON_KEY);
-  } catch {
-    // Fallback to default values if config endpoint fails
-    return createClient(
-      'https://ibjbxupcqdyfcnvlwblj.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImliamJ4dXBjcWR5ZmNudmx3YmxqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzE4NDM5OTcsImV4cCI6MjA0NzQxOTk5N30.wQ0VuIGW9vgFz-cxcpM6KQP0kzGGj6NhJ0ZNPZEJZyQ'
-    );
+  } catch (error) {
+    console.error('Error getting Supabase client:', error);
+    throw error;
   }
 };
 
-// Default client for immediate use - will be updated with proper config
-export const supabase = createClient(
-  'https://ibjbxupcqdyfcnvlwblj.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImliamJ4dXBjcWR5ZmNudmx3YmxqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzE4NDM5OTcsImV4cCI6MjA0NzQxOTk5N30.wQ0VuIGW9vgFz-cxcpM6KQP0kzGGj6NhJ0ZNPZEJZyQ'
-)
+// Initialize client with environment variables
+let supabaseClient: any = null;
+
+export const supabase = new Proxy({}, {
+  get: (target, prop) => {
+    if (!supabaseClient) {
+      // Initialize client on first access
+      fetch('/api/config')
+        .then(res => res.json())
+        .then(config => {
+          if (config.VITE_SUPABASE_URL && config.VITE_SUPABASE_ANON_KEY) {
+            supabaseClient = createClient(config.VITE_SUPABASE_URL, config.VITE_SUPABASE_ANON_KEY);
+          }
+        });
+    }
+    return supabaseClient?.[prop];
+  }
+});
 
 export type Database = {
   public: {

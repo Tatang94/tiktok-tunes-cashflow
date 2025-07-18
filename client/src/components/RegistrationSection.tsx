@@ -46,16 +46,40 @@ const RegistrationSection = () => {
           video_count: 0
         }]);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Registration error:', error);
+        
+        // Check if it's a table not found error
+        if (error.code === '42P01') {
+          toast({
+            title: "Database Belum Siap",
+            description: "Silakan setup database terlebih dahulu menggunakan file database-clean-setup.sql",
+            variant: "destructive"
+          });
+          return;
+        }
+        
+        throw error;
+      }
 
       toast({
         title: "Pendaftaran Berhasil! 🎉",
         description: "Akun creator kamu sudah aktif. Yuk mulai upload video!"
       });
 
+      // Reset form
+      setFormData({
+        tiktok_username: "",
+        email: "",
+        phone: "",
+        ewallet_type: "",
+        ewallet_number: ""
+      });
+
       // Redirect to creator dashboard
       setLocation('/creator-dashboard');
     } catch (error: any) {
+      console.error('Registration error:', error);
       toast({
         title: "Error",
         description: error.message || "Gagal mendaftar. Coba lagi!",
@@ -170,9 +194,8 @@ const RegistrationSection = () => {
             </div>
             
             <Button 
-              className="w-full" 
+              className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white" 
               size="lg" 
-              variant="tiktok"
               onClick={handleSubmit}
               disabled={isLoading}
             >
