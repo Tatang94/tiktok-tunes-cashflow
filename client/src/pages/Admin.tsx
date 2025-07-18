@@ -10,9 +10,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
-import { Users, Music, VideoIcon, DollarSign, Plus, Edit, Check, X } from "lucide-react";
+import { Users, Music, VideoIcon, DollarSign, Plus, Edit, Check, X, Lock, User } from "lucide-react";
 
 const Admin = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loginForm, setLoginForm] = useState({ username: "", password: "" });
   const [creators, setCreators] = useState<any[]>([]);
   const [songs, setSongs] = useState<any[]>([]);
   const [submissions, setSubmissions] = useState<any[]>([]);
@@ -37,8 +39,42 @@ const Admin = () => {
   });
 
   useEffect(() => {
-    fetchData();
+    // Check if already logged in
+    const adminAuth = localStorage.getItem('adminAuth');
+    if (adminAuth === 'true') {
+      setIsAuthenticated(true);
+      fetchData();
+    }
   }, []);
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (loginForm.username === 'admin' && loginForm.password === 'audio') {
+      setIsAuthenticated(true);
+      localStorage.setItem('adminAuth', 'true');
+      fetchData();
+      toast({
+        title: "Login berhasil!",
+        description: "Selamat datang di admin panel."
+      });
+    } else {
+      toast({
+        title: "Login gagal",
+        description: "Username atau password salah.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    localStorage.removeItem('adminAuth');
+    setLoginForm({ username: "", password: "" });
+    toast({
+      title: "Logout berhasil",
+      description: "Anda telah keluar dari admin panel."
+    });
+  };
 
   const fetchData = async () => {
     try {
@@ -162,12 +198,73 @@ const Admin = () => {
     }
   };
 
+  // Login Form
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-tiktok-blue via-tiktok-purple to-tiktok-pink flex items-center justify-center p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader className="space-y-1">
+            <div className="flex items-center gap-2 justify-center mb-4">
+              <Lock className="w-8 h-8 text-tiktok-blue" />
+              <h2 className="text-2xl font-bold">Admin Login</h2>
+            </div>
+            <p className="text-center text-muted-foreground">
+              Masuk ke admin panel untuk mengelola platform
+            </p>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleLogin} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="username">Username</Label>
+                <div className="relative">
+                  <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="username"
+                    type="text"
+                    placeholder="Masukkan username"
+                    value={loginForm.username}
+                    onChange={(e) => setLoginForm({...loginForm, username: e.target.value})}
+                    className="pl-10"
+                    required
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="Masukkan password"
+                    value={loginForm.password}
+                    onChange={(e) => setLoginForm({...loginForm, password: e.target.value})}
+                    className="pl-10"
+                    required
+                  />
+                </div>
+              </div>
+              <Button type="submit" className="w-full">
+                Masuk Admin Panel
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background p-4">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2">Admin Dashboard</h1>
-          <p className="text-muted-foreground">Kelola platform TikTok monetization</p>
+        <div className="mb-8 flex justify-between items-center">
+          <div>
+            <h1 className="text-4xl font-bold mb-2">Admin Dashboard</h1>
+            <p className="text-muted-foreground">Kelola platform TikTok monetization</p>
+          </div>
+          <Button onClick={handleLogout} variant="outline">
+            Logout
+          </Button>
         </div>
 
         {/* Stats Cards */}
