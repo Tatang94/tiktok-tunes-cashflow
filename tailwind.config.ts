@@ -18,7 +18,13 @@ export default {
 			}
 		},
 		extend: {
+			fontFamily: {
+				'poppins': ['Poppins', 'sans-serif'],
+			},
 			colors: {
+				'tiktok-blue': 'hsl(var(--tiktok-blue))',
+				'tiktok-pink': 'hsl(var(--tiktok-pink))',
+				'tiktok-purple': 'hsl(var(--tiktok-purple))',
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
 				ring: 'hsl(var(--ring))',
