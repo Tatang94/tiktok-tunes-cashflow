@@ -21,7 +21,7 @@ const HowItWorks = () => {
     {
       number: "3️⃣",
       title: "Upload & Klaim",
-      description: "Submit link videomu ke dashboard. Dapatkan Rp 100/video!",
+      description: "Submit link videomu ke dashboard. Dapatkan Rp 0,00002489 per view!",
       icon: <Upload className="w-8 h-8" />,
       color: "text-tiktok-blue"
     }

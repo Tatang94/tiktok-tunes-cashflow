@@ -32,7 +32,7 @@ const HeroSection = () => {
         </h1>
         
         <p className="text-xl md:text-2xl text-muted-foreground mb-8 font-medium">
-          🎶 Dapatkan <span className="text-tiktok-pink font-bold">Rp 100</span> setiap kali kamu bikin video TikTok pakai lagu dari kami!
+          🎶 Dapatkan <span className="text-tiktok-pink font-bold">Rp 0,00002489 per view</span> setiap kali kamu bikin video TikTok pakai lagu dari kami!
         </p>
         
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">

@@ -160,7 +160,7 @@ const SongListSection = () => {
                   </Badge>
                   <div className="flex justify-between text-sm">
                     <span>Durasi: {song.duration}</span>
-                    <span className="font-semibold text-tiktok-pink">Rp {song.earnings_per_video?.toLocaleString('id-ID') || 100}/video</span>
+                    <span className="font-semibold text-tiktok-pink">Rp 0,00002489/view</span>
                   </div>
                 </div>
                 
