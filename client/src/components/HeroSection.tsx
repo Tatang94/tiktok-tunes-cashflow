@@ -38,8 +38,7 @@ const HeroSection = () => {
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
           <Button 
             size="lg" 
-            variant="tiktok" 
-            className="text-lg px-8 py-6"
+            className="text-lg px-8 py-6 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white"
             onClick={() => scrollToSection('registration-section')}
           >
             🔘 Mulai Sekarang
