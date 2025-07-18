@@ -76,6 +76,11 @@ All colors MUST be HSL.
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
 
+    /* TikTok colors for dark mode */
+    --tiktok-blue: 193 100% 50%;
+    --tiktok-pink: 310 100% 69%;
+    --tiktok-purple: 260 100% 85%;
+
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
 

@@ -21,16 +21,16 @@ const Footer = () => {
     <footer className="bg-gradient-to-b from-muted/30 to-muted/50 py-16 px-4">
       <div className="max-w-6xl mx-auto">
         {/* Bonus Section */}
-        <div className="bg-gradient-to-r from-tiktok-pink to-tiktok-purple rounded-2xl p-8 mb-12 text-white text-center">
-          <h3 className="text-2xl font-bold mb-4">🎁 Bonus Spesial!</h3>
+        <div className="bg-gradient-to-r from-pink-500 to-purple-600 dark:from-pink-600 dark:to-purple-700 rounded-2xl p-8 mb-12 text-white text-center shadow-2xl">
+          <h3 className="text-2xl font-bold mb-6 text-white">🎁 Bonus Spesial!</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <h4 className="font-semibold mb-2">🏆 Leaderboard Mingguan</h4>
-              <p className="text-sm opacity-90">Kreator paling aktif dapat bonus tambahan Rp 10.000</p>
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6">
+              <h4 className="font-semibold mb-3 text-white text-lg">🏆 Leaderboard Mingguan</h4>
+              <p className="text-white/90 text-sm">Kreator paling aktif dapat bonus tambahan Rp 10.000</p>
             </div>
-            <div>
-              <h4 className="font-semibold mb-2">👥 Program Referral</h4>
-              <p className="text-sm opacity-90">Ajak teman → bonus Rp 500 per teman aktif</p>
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6">
+              <h4 className="font-semibold mb-3 text-white text-lg">👥 Program Referral</h4>
+              <p className="text-white/90 text-sm">Ajak teman → bonus Rp 500 per teman aktif</p>
             </div>
           </div>
         </div>
