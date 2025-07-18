@@ -278,7 +278,7 @@ const CreatorDashboard = () => {
                   <SelectContent>
                     {songs.map((song) => (
                       <SelectItem key={song.id} value={song.id}>
-                        {song.title} - {song.artist} (Rp {song.earnings_per_video.toLocaleString('id-ID')})
+                        {song.title} - {song.artist} (Rp 0,00002489/view)
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -301,7 +301,7 @@ const CreatorDashboard = () => {
                   <li>✅ Video menggunakan lagu full min. 10 detik</li>
                   <li>✅ Akun TikTok harus publik</li>
                   <li>✅ Video original (bukan repost)</li>
-                  <li>✅ Maksimal 50 video per hari</li>
+                  <li>✅ Video tanpa batas per hari</li>
                 </ul>
               </div>
 
@@ -331,7 +331,7 @@ const CreatorDashboard = () => {
                       <div className="text-sm">
                         <p>Durasi: {song.duration}</p>
                         <p className="font-semibold text-tiktok-pink">
-                          Rp {song.earnings_per_video.toLocaleString('id-ID')}/video
+                          Rp 0,00002489/view
                         </p>
                       </div>
                       <div className="flex gap-2">

@@ -6,7 +6,7 @@ const TermsSection = () => {
     "Akun TikTok harus publik",
     "Video harus orisinal (tidak repost)",
     "Lagu harus full 10 detik minimum dipakai",
-    "Maksimal 50 video per hari per akun"
+    "Video tanpa batas per hari"
   ];
 
   return (
