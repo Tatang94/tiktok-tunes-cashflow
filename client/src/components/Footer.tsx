@@ -56,7 +56,7 @@ const Footer = () => {
           {/* Brand Section */}
           <div className="md:col-span-1">
             <h3 className="text-2xl font-bold bg-gradient-to-r from-tiktok-pink to-tiktok-purple bg-clip-text text-transparent mb-4">
-              TikTok Tunes Cashflow
+              CreatorPro Platform
             </h3>
             <p className="text-muted-foreground mb-4">
               Platform monetisasi TikTok #1 di Indonesia. Ubah kreativitas jadi cuan!

@@ -21,7 +21,7 @@ const HeroSection = () => {
         <div className="mb-6">
           <span className="inline-flex items-center gap-2 bg-gradient-to-r from-tiktok-pink to-tiktok-purple text-white px-4 py-2 rounded-full text-sm font-semibold">
             <TrendingUp className="w-4 h-4" />
-            Platform #1 Creator TikTok Indonesia
+            Platform Creator Monetisasi #1 Indonesia
           </span>
         </div>
         

@@ -250,7 +250,7 @@ const Legal = () => {
               </div>
               
               <div className="text-sm text-muted-foreground border-t pt-4">
-                <p><strong>Email:</strong> legal@tiktok-creator.com</p>
+                <p><strong>Email:</strong> legal@creatorpro.id</p>
                 <p><strong>Response time:</strong> 1-2 hari kerja</p>
                 <p><strong>Consultation hours:</strong> Senin-Jumat, 09:00-17:00 WIB</p>
               </div>
