@@ -10,6 +10,7 @@ import { User, Mail, Phone, Wallet } from "lucide-react";
 import { useLocation } from "wouter";
 
 const RegistrationSection = () => {
+  const [isLoginMode, setIsLoginMode] = useState(false);
   const [formData, setFormData] = useState({
     tiktok_username: "",
     email: "",
@@ -17,12 +18,20 @@ const RegistrationSection = () => {
     ewallet_type: "",
     ewallet_number: ""
   });
+  const [loginData, setLoginData] = useState({
+    tiktok_username: "",
+    email: ""
+  });
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const [, setLocation] = useLocation();
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleLoginInputChange = (field: string, value: string) => {
+    setLoginData(prev => ({ ...prev, [field]: value }));
   };
 
   const validateForm = () => {
@@ -119,6 +128,14 @@ const RegistrationSection = () => {
         description: "Akun creator kamu sudah aktif. Yuk mulai upload video!"
       });
 
+      // Store creator info for session
+      localStorage.setItem('currentCreator', JSON.stringify({
+        ...formData,
+        total_earnings: 0,
+        video_count: 0,
+        id: Date.now().toString() // temporary ID
+      }));
+
       // Reset form
       setFormData({
         tiktok_username: "",
@@ -142,117 +159,255 @@ const RegistrationSection = () => {
     }
   };
 
+  const handleLogin = async () => {
+    // Validasi login
+    const tiktokPattern = /^@[a-zA-Z0-9._]{2,23}$/;
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    
+    if (!tiktokPattern.test(loginData.tiktok_username)) {
+      toast({
+        title: "Username Invalid",
+        description: "TikTok username harus dimulai dengan @ (contoh: @username123)",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!emailPattern.test(loginData.email)) {
+      toast({
+        title: "Email Invalid",
+        description: "Masukkan email yang valid",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const supabase = await getSupabaseClient();
+      const { data: creator, error } = await supabase
+        .from('creators')
+        .select('*')
+        .eq('tiktok_username', loginData.tiktok_username)
+        .eq('email', loginData.email)
+        .single();
+
+      if (error || !creator) {
+        toast({
+          title: "Login Gagal",
+          description: "Username atau email tidak ditemukan. Silakan daftar terlebih dahulu.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Store creator info in localStorage for session
+      localStorage.setItem('currentCreator', JSON.stringify(creator));
+      
+      toast({
+        title: "Login Berhasil! 🎉",
+        description: `Selamat datang kembali, ${creator.tiktok_username}!`
+      });
+
+      // Reset form
+      setLoginData({
+        tiktok_username: "",
+        email: ""
+      });
+
+      // Redirect to creator dashboard
+      setLocation('/creator-dashboard');
+    } catch (error: any) {
+      console.error('Login error:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Gagal login. Coba lagi!",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <section id="registration-section" className="py-20 px-4 bg-gradient-to-b from-background to-muted/30">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
-            Daftar Sekarang & Dashboard
+            {isLoginMode ? "Login Creator" : "Daftar Sekarang & Dashboard"}
           </h2>
           <p className="text-xl text-muted-foreground">
-            Mulai journey monetize TikTok kamu hari ini!
+            {isLoginMode ? "Sudah punya akun? Masuk sekarang!" : "Mulai journey monetize TikTok kamu hari ini!"}
           </p>
         </div>
         
         <Card className="border-2 border-tiktok-purple/20">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl font-bold">
-              Form Pendaftaran Creator
+              {isLoginMode ? "Login Creator" : "Form Pendaftaran Creator"}
             </CardTitle>
+            <div className="flex justify-center gap-2 mt-4">
+              <Button
+                variant={!isLoginMode ? "default" : "outline"}
+                onClick={() => setIsLoginMode(false)}
+                className="px-6"
+              >
+                Daftar Baru
+              </Button>
+              <Button
+                variant={isLoginMode ? "default" : "outline"}
+                onClick={() => setIsLoginMode(true)}
+                className="px-6"
+              >
+                Sudah Punya Akun
+              </Button>
+            </div>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <Label htmlFor="tiktok-name" className="flex items-center gap-2">
-                  <User className="w-4 h-4" />
-                  Nama TikTok
-                </Label>
-                <Input 
-                  id="tiktok-name" 
-                  value={formData.tiktok_username}
-                  onChange={(e) => handleInputChange('tiktok_username', e.target.value)}
-                  placeholder="@username_tiktok (contoh: @creativegirl123)" 
-                  className="border-2 focus:border-tiktok-pink"
-                />
+            {isLoginMode ? (
+              // Login Form
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="login-tiktok" className="flex items-center gap-2">
+                    <User className="w-4 h-4" />
+                    Username TikTok
+                  </Label>
+                  <Input 
+                    id="login-tiktok" 
+                    value={loginData.tiktok_username}
+                    onChange={(e) => handleLoginInputChange('tiktok_username', e.target.value)}
+                    placeholder="@username_tiktok" 
+                    className="border-2 focus:border-tiktok-pink"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="login-email" className="flex items-center gap-2">
+                    <Mail className="w-4 h-4" />
+                    Email
+                  </Label>
+                  <Input 
+                    id="login-email" 
+                    type="email"
+                    value={loginData.email}
+                    onChange={(e) => handleLoginInputChange('email', e.target.value)}
+                    placeholder="email@example.com" 
+                    className="border-2 focus:border-tiktok-pink"
+                  />
+                </div>
+                
+                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+                  <p className="text-sm text-blue-700 dark:text-blue-300">
+                    💡 Masukkan username TikTok dan email yang sama dengan waktu pendaftaran
+                  </p>
+                </div>
+                
+                <Button 
+                  className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white" 
+                  size="lg" 
+                  onClick={handleLogin}
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Masuk..." : "🔐 Masuk ke Dashboard"}
+                </Button>
               </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="email" className="flex items-center gap-2">
-                  <Mail className="w-4 h-4" />
-                  Email
-                </Label>
-                <Input 
-                  id="email" 
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => handleInputChange('email', e.target.value)}
-                  placeholder="nama@gmail.com (harus email valid)" 
-                  className="border-2 focus:border-tiktok-pink"
-                />
+            ) : (
+              // Registration Form
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="tiktok-name" className="flex items-center gap-2">
+                      <User className="w-4 h-4" />
+                      Nama TikTok
+                    </Label>
+                    <Input 
+                      id="tiktok-name" 
+                      value={formData.tiktok_username}
+                      onChange={(e) => handleInputChange('tiktok_username', e.target.value)}
+                      placeholder="@username_tiktok (contoh: @creativegirl123)" 
+                      className="border-2 focus:border-tiktok-pink"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="email" className="flex items-center gap-2">
+                      <Mail className="w-4 h-4" />
+                      Email
+                    </Label>
+                    <Input 
+                      id="email" 
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => handleInputChange('email', e.target.value)}
+                      placeholder="nama@gmail.com (harus email valid)" 
+                      className="border-2 focus:border-tiktok-pink"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="phone" className="flex items-center gap-2">
+                      <Phone className="w-4 h-4" />
+                      Nomor HP
+                    </Label>
+                    <Input 
+                      id="phone" 
+                      value={formData.phone}
+                      onChange={(e) => handleInputChange('phone', e.target.value)}
+                      placeholder="081234567890 (nomor Indonesia valid)" 
+                      className="border-2 focus:border-tiktok-pink"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="ewallet" className="flex items-center gap-2">
+                      <Wallet className="w-4 h-4" />
+                      Akun eWallet
+                    </Label>
+                    <Select value={formData.ewallet_type} onValueChange={(value) => handleInputChange('ewallet_type', value)}>
+                      <SelectTrigger className="border-2 focus:border-tiktok-pink">
+                        <SelectValue placeholder="Pilih eWallet" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="dana">DANA</SelectItem>
+                        <SelectItem value="ovo">OVO</SelectItem>
+                        <SelectItem value="gopay">GoPay</SelectItem>
+                        <SelectItem value="shopeepay">ShopeePay</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="ewallet-number">Nomor eWallet</Label>
+                  <Input 
+                    id="ewallet-number"
+                    value={formData.ewallet_number}
+                    onChange={(e) => handleInputChange('ewallet_number', e.target.value)}
+                    placeholder="081234567890 (minimal 10 digit angka)" 
+                    className="border-2 focus:border-tiktok-pink"
+                  />
+                </div>
+                
+                <div className="bg-muted/30 p-4 rounded-lg">
+                  <h4 className="font-semibold mb-2">Benefit yang kamu dapatkan:</h4>
+                  <ul className="space-y-1 text-sm text-muted-foreground">
+                    <li>✅ Akses ke semua lagu trending</li>
+                    <li>✅ Dashboard tracking video & earnings</li>
+                    <li>✅ Payment otomatis setiap minggu</li>
+                    <li>✅ Support 24/7 dari tim kami</li>
+                  </ul>
+                </div>
+                
+                <Button 
+                  className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white" 
+                  size="lg" 
+                  onClick={handleSubmit}
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Mendaftar..." : "🔘 Daftar & Mulai Mengupload Video"}
+                </Button>
               </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="phone" className="flex items-center gap-2">
-                  <Phone className="w-4 h-4" />
-                  Nomor HP
-                </Label>
-                <Input 
-                  id="phone" 
-                  value={formData.phone}
-                  onChange={(e) => handleInputChange('phone', e.target.value)}
-                  placeholder="081234567890 (nomor Indonesia valid)" 
-                  className="border-2 focus:border-tiktok-pink"
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="ewallet" className="flex items-center gap-2">
-                  <Wallet className="w-4 h-4" />
-                  Akun eWallet
-                </Label>
-                <Select value={formData.ewallet_type} onValueChange={(value) => handleInputChange('ewallet_type', value)}>
-                  <SelectTrigger className="border-2 focus:border-tiktok-pink">
-                    <SelectValue placeholder="Pilih eWallet" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="dana">DANA</SelectItem>
-                    <SelectItem value="ovo">OVO</SelectItem>
-                    <SelectItem value="gopay">GoPay</SelectItem>
-                    <SelectItem value="shopeepay">ShopeePay</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="ewallet-number">Nomor eWallet</Label>
-              <Input 
-                id="ewallet-number"
-                value={formData.ewallet_number}
-                onChange={(e) => handleInputChange('ewallet_number', e.target.value)}
-                placeholder="081234567890 (minimal 10 digit angka)" 
-                className="border-2 focus:border-tiktok-pink"
-              />
-            </div>
-            
-            <div className="bg-muted/30 p-4 rounded-lg">
-              <h4 className="font-semibold mb-2">Benefit yang kamu dapatkan:</h4>
-              <ul className="space-y-1 text-sm text-muted-foreground">
-                <li>✅ Akses ke semua lagu trending</li>
-                <li>✅ Dashboard tracking video & earnings</li>
-                <li>✅ Payment otomatis setiap minggu</li>
-                <li>✅ Support 24/7 dari tim kami</li>
-              </ul>
-            </div>
-            
-            <Button 
-              className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white" 
-              size="lg" 
-              onClick={handleSubmit}
-              disabled={isLoading}
-            >
-              {isLoading ? "Mendaftar..." : "🔘 Daftar & Mulai Mengupload Video"}
-            </Button>
+            )}
           </CardContent>
         </Card>
       </div>

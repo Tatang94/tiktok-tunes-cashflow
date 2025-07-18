@@ -36,17 +36,24 @@ const CreatorDashboard = () => {
     try {
       const supabase = await getSupabaseClient();
       
-      // Set demo creator data when database is not ready
-      setCreator({
-        id: mockCreatorId,
-        tiktok_username: 'demo_creator',
-        email: 'demo@example.com',
-        phone: '08123456789',
-        ewallet_type: 'DANA',
-        ewallet_number: '08123456789',
-        total_earnings: 0,
-        video_count: 0
-      });
+      // Check if we have creator data from localStorage first
+      const storedCreator = localStorage.getItem('currentCreator');
+      if (storedCreator) {
+        const creatorData = JSON.parse(storedCreator);
+        setCreator(creatorData);
+      } else {
+        // Fallback to demo creator data when no stored data
+        setCreator({
+          id: mockCreatorId,
+          tiktok_username: 'demo_creator',
+          email: 'demo@example.com',
+          phone: '08123456789',
+          ewallet_type: 'DANA',
+          ewallet_number: '08123456789',
+          total_earnings: 0,
+          video_count: 0
+        });
+      }
 
       // Try to fetch songs, use sample data if database not ready
       try {
@@ -192,9 +199,22 @@ const CreatorDashboard = () => {
   return (
     <div className="min-h-screen bg-background p-4">
       <div className="max-w-6xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2">Creator Dashboard</h1>
-          <p className="text-muted-foreground">Selamat datang, @{creator.tiktok_username}!</p>
+        <div className="mb-8 flex justify-between items-center">
+          <div>
+            <h1 className="text-4xl font-bold mb-2">Creator Dashboard</h1>
+            <p className="text-muted-foreground">Selamat datang, @{creator.tiktok_username}!</p>
+          </div>
+          <Button 
+            onClick={() => {
+              localStorage.removeItem('currentCreator');
+              window.location.href = '/';
+            }}
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <User className="w-4 h-4" />
+            Logout
+          </Button>
         </div>
 
         {/* Stats Cards */}
