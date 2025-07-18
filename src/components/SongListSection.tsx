@@ -1,35 +1,41 @@
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { supabase } from "@/lib/supabase";
 import { Music, Download, ExternalLink, TrendingUp } from "lucide-react";
 
 const SongListSection = () => {
-  const songs = [
-    {
-      title: "DJ TikTok Viral",
-      artist: "BeatMaster",
-      status: "🔥 Trending",
-      earnings: "Rp 100/video",
-      duration: "0:30",
-      color: "from-tiktok-pink to-red-400"
-    },
-    {
-      title: "Chill Vibes Only", 
-      artist: "LofiKing",
-      status: "✨ Popular",
-      earnings: "Rp 100/video",
-      duration: "0:25",
-      color: "from-tiktok-purple to-blue-400"
-    },
-    {
-      title: "Beat Drop 2025",
-      artist: "EDMPro",
-      status: "🚀 New Hit",
-      earnings: "Rp 100/video", 
-      duration: "0:20",
-      color: "from-tiktok-blue to-green-400"
+  const [songs, setSongs] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetchSongs();
+  }, []);
+
+  const fetchSongs = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('songs')
+        .select('*')
+        .eq('is_active', true)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      setSongs(data || []);
+    } catch (error) {
+      console.error('Error fetching songs:', error);
     }
-  ];
+  };
+
+  const getColorClass = (index: number) => {
+    const colors = [
+      "from-tiktok-pink to-red-400",
+      "from-tiktok-purple to-blue-400", 
+      "from-tiktok-blue to-green-400"
+    ];
+    return colors[index % colors.length];
+  };
 
   return (
     <section className="py-20 px-4">
@@ -45,8 +51,8 @@ const SongListSection = () => {
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
           {songs.map((song, index) => (
-            <Card key={index} className="overflow-hidden hover:shadow-xl transition-all duration-300 group">
-              <div className={`h-2 bg-gradient-to-r ${song.color}`}></div>
+            <Card key={song.id} className="overflow-hidden hover:shadow-xl transition-all duration-300 group">
+              <div className={`h-2 bg-gradient-to-r ${getColorClass(index)}`}></div>
               <CardContent className="p-6">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
@@ -62,19 +68,37 @@ const SongListSection = () => {
                   </Badge>
                   <div className="flex justify-between text-sm">
                     <span>Durasi: {song.duration}</span>
-                    <span className="font-semibold text-tiktok-pink">{song.earnings}</span>
+                    <span className="font-semibold text-tiktok-pink">Rp {song.earnings_per_video?.toLocaleString('id-ID') || 100}/video</span>
                   </div>
                 </div>
                 
                 <div className="space-y-2">
-                  <Button className="w-full" variant="tiktok">
-                    <Download className="w-4 h-4 mr-2" />
-                    Download Lagu
-                  </Button>
-                  <Button className="w-full" variant="outline">
-                    <ExternalLink className="w-4 h-4 mr-2" />
-                    Copy Link Spotify
-                  </Button>
+                  {song.file_url ? (
+                    <Button className="w-full" variant="tiktok" asChild>
+                      <a href={song.file_url} target="_blank" rel="noopener noreferrer">
+                        <Download className="w-4 h-4 mr-2" />
+                        Download Lagu
+                      </a>
+                    </Button>
+                  ) : (
+                    <Button className="w-full" variant="tiktok" disabled>
+                      <Download className="w-4 h-4 mr-2" />
+                      Download Lagu
+                    </Button>
+                  )}
+                  {song.spotify_url ? (
+                    <Button className="w-full" variant="outline" asChild>
+                      <a href={song.spotify_url} target="_blank" rel="noopener noreferrer">
+                        <ExternalLink className="w-4 h-4 mr-2" />
+                        Link Spotify
+                      </a>
+                    </Button>
+                  ) : (
+                    <Button className="w-full" variant="outline" disabled>
+                      <ExternalLink className="w-4 h-4 mr-2" />
+                      Link Spotify
+                    </Button>
+                  )}
                 </div>
               </CardContent>
             </Card>

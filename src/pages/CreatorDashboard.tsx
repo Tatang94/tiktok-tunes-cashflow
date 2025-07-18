@@ -1,0 +1,340 @@
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { supabase } from "@/lib/supabase";
+import { useToast } from "@/hooks/use-toast";
+import { DollarSign, Video, Music, Upload, ExternalLink } from "lucide-react";
+
+const CreatorDashboard = () => {
+  const [creator, setCreator] = useState<any>(null);
+  const [songs, setSongs] = useState<any[]>([]);
+  const [submissions, setSubmissions] = useState<any[]>([]);
+  const [selectedSong, setSelectedSong] = useState("");
+  const [tiktokUrl, setTiktokUrl] = useState("");
+  
+  const { toast } = useToast();
+
+  // For demo purposes, we'll use a mock creator ID
+  // In a real app, this would come from authentication
+  const mockCreatorId = "demo-creator-123";
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      // Fetch creator data
+      const { data: creatorData } = await supabase
+        .from('creators')
+        .select('*')
+        .eq('id', mockCreatorId)
+        .single();
+
+      // If creator doesn't exist, create demo creator
+      if (!creatorData) {
+        const { data: newCreator } = await supabase
+          .from('creators')
+          .insert([{
+            id: mockCreatorId,
+            tiktok_username: 'demo_creator',
+            email: 'demo@example.com',
+            phone: '08123456789',
+            ewallet_type: 'DANA',
+            ewallet_number: '08123456789',
+            total_earnings: 0,
+            video_count: 0
+          }])
+          .select()
+          .single();
+        
+        setCreator(newCreator);
+      } else {
+        setCreator(creatorData);
+      }
+
+      // Fetch active songs
+      const { data: songsData } = await supabase
+        .from('songs')
+        .select('*')
+        .eq('is_active', true)
+        .order('created_at', { ascending: false });
+
+      setSongs(songsData || []);
+
+      // Fetch creator's submissions
+      const { data: submissionsData } = await supabase
+        .from('video_submissions')
+        .select(`
+          *,
+          songs(title, artist)
+        `)
+        .eq('creator_id', mockCreatorId)
+        .order('created_at', { ascending: false });
+
+      setSubmissions(submissionsData || []);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
+  const submitVideo = async () => {
+    if (!selectedSong || !tiktokUrl) {
+      toast({
+        title: "Error",
+        description: "Pilih lagu dan masukkan URL TikTok",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('video_submissions')
+        .insert([{
+          creator_id: mockCreatorId,
+          song_id: selectedSong,
+          tiktok_url: tiktokUrl,
+          status: 'pending',
+          earnings: 0
+        }]);
+
+      if (error) throw error;
+
+      toast({
+        title: "Video berhasil disubmit!",
+        description: "Video kamu sedang dalam review. Cek status dalam 24 jam."
+      });
+
+      setSelectedSong("");
+      setTiktokUrl("");
+      fetchData();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Gagal submit video.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  if (!creator) {
+    return <div>Loading...</div>;
+  }
+
+  return (
+    <div className="min-h-screen bg-background p-4">
+      <div className="max-w-6xl mx-auto">
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold mb-2">Creator Dashboard</h1>
+          <p className="text-muted-foreground">Selamat datang, @{creator.tiktok_username}!</p>
+        </div>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center gap-4">
+                <DollarSign className="w-8 h-8 text-green-500" />
+                <div>
+                  <p className="text-sm text-muted-foreground">Total Earnings</p>
+                  <p className="text-2xl font-bold">Rp {(creator.total_earnings || 0).toLocaleString('id-ID')}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center gap-4">
+                <Video className="w-8 h-8 text-tiktok-pink" />
+                <div>
+                  <p className="text-sm text-muted-foreground">Videos Approved</p>
+                  <p className="text-2xl font-bold">{creator.video_count || 0}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center gap-4">
+                <Music className="w-8 h-8 text-tiktok-purple" />
+                <div>
+                  <p className="text-sm text-muted-foreground">Available Songs</p>
+                  <p className="text-2xl font-bold">{songs.length}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Submit New Video */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Upload className="w-5 h-5" />
+                Submit Video Baru
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="song-select">Pilih Lagu</Label>
+                <Select value={selectedSong} onValueChange={setSelectedSong}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Pilih lagu yang digunakan" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {songs.map((song) => (
+                      <SelectItem key={song.id} value={song.id}>
+                        {song.title} - {song.artist} (Rp {song.earnings_per_video.toLocaleString('id-ID')})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="tiktok-url">URL TikTok Video</Label>
+                <Input
+                  id="tiktok-url"
+                  value={tiktokUrl}
+                  onChange={(e) => setTiktokUrl(e.target.value)}
+                  placeholder="https://www.tiktok.com/@username/video/..."
+                />
+              </div>
+
+              <div className="bg-muted/30 p-4 rounded-lg">
+                <h4 className="font-semibold mb-2">Syarat Submit:</h4>
+                <ul className="space-y-1 text-sm text-muted-foreground">
+                  <li>✅ Video menggunakan lagu full min. 10 detik</li>
+                  <li>✅ Akun TikTok harus publik</li>
+                  <li>✅ Video original (bukan repost)</li>
+                  <li>✅ Maksimal 50 video per hari</li>
+                </ul>
+              </div>
+
+              <Button onClick={submitVideo} className="w-full" variant="tiktok">
+                Submit Video untuk Review
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Available Songs */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Lagu Available</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4 max-h-96 overflow-y-auto">
+                {songs.map((song) => (
+                  <div key={song.id} className="border rounded-lg p-4">
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <h4 className="font-semibold">{song.title}</h4>
+                        <p className="text-sm text-muted-foreground">{song.artist}</p>
+                      </div>
+                      <Badge variant="secondary">{song.status}</Badge>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <div className="text-sm">
+                        <p>Durasi: {song.duration}</p>
+                        <p className="font-semibold text-tiktok-pink">
+                          Rp {song.earnings_per_video.toLocaleString('id-ID')}/video
+                        </p>
+                      </div>
+                      <div className="flex gap-2">
+                        {song.file_url && (
+                          <Button size="sm" variant="outline" asChild>
+                            <a href={song.file_url} target="_blank" rel="noopener noreferrer">
+                              Download
+                            </a>
+                          </Button>
+                        )}
+                        {song.spotify_url && (
+                          <Button size="sm" variant="outline" asChild>
+                            <a href={song.spotify_url} target="_blank" rel="noopener noreferrer">
+                              <ExternalLink className="w-4 h-4" />
+                            </a>
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Submission History */}
+        <Card className="mt-8">
+          <CardHeader>
+            <CardTitle>Riwayat Submission</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Lagu</TableHead>
+                  <TableHead>TikTok URL</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Earnings</TableHead>
+                  <TableHead>Tanggal Submit</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {submissions.map((submission) => (
+                  <TableRow key={submission.id}>
+                    <TableCell>
+                      <div>
+                        <div className="font-medium">{submission.songs?.title}</div>
+                        <div className="text-sm text-muted-foreground">{submission.songs?.artist}</div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <a 
+                        href={submission.tiktok_url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-tiktok-blue hover:underline"
+                      >
+                        View Video
+                      </a>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={
+                        submission.status === 'approved' ? 'default' : 
+                        submission.status === 'rejected' ? 'destructive' : 
+                        'secondary'
+                      }>
+                        {submission.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      {submission.status === 'approved' 
+                        ? `Rp ${submission.earnings.toLocaleString('id-ID')}` 
+                        : '-'
+                      }
+                    </TableCell>
+                    <TableCell>
+                      {new Date(submission.created_at).toLocaleDateString('id-ID')}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+};
+
+export default CreatorDashboard;

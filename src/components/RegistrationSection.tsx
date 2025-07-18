@@ -1,11 +1,70 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { supabase } from "@/lib/supabase";
+import { useToast } from "@/hooks/use-toast";
 import { User, Mail, Phone, Wallet } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const RegistrationSection = () => {
+  const [formData, setFormData] = useState({
+    tiktok_username: "",
+    email: "",
+    phone: "",
+    ewallet_type: "",
+    ewallet_number: ""
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSubmit = async () => {
+    if (!formData.tiktok_username || !formData.email || !formData.phone || !formData.ewallet_type || !formData.ewallet_number) {
+      toast({
+        title: "Error",
+        description: "Semua field harus diisi!",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const { error } = await supabase
+        .from('creators')
+        .insert([{
+          ...formData,
+          total_earnings: 0,
+          video_count: 0
+        }]);
+
+      if (error) throw error;
+
+      toast({
+        title: "Pendaftaran Berhasil! 🎉",
+        description: "Akun creator kamu sudah aktif. Yuk mulai upload video!"
+      });
+
+      // Redirect to creator dashboard
+      navigate('/creator-dashboard');
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Gagal mendaftar. Coba lagi!",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <section className="py-20 px-4 bg-gradient-to-b from-background to-muted/30">
       <div className="max-w-4xl mx-auto">
@@ -33,6 +92,8 @@ const RegistrationSection = () => {
                 </Label>
                 <Input 
                   id="tiktok-name" 
+                  value={formData.tiktok_username}
+                  onChange={(e) => handleInputChange('tiktok_username', e.target.value)}
                   placeholder="@username_tiktok" 
                   className="border-2 focus:border-tiktok-pink"
                 />
@@ -46,6 +107,8 @@ const RegistrationSection = () => {
                 <Input 
                   id="email" 
                   type="email"
+                  value={formData.email}
+                  onChange={(e) => handleInputChange('email', e.target.value)}
                   placeholder="email@example.com" 
                   className="border-2 focus:border-tiktok-pink"
                 />
@@ -58,6 +121,8 @@ const RegistrationSection = () => {
                 </Label>
                 <Input 
                   id="phone" 
+                  value={formData.phone}
+                  onChange={(e) => handleInputChange('phone', e.target.value)}
                   placeholder="08123456789" 
                   className="border-2 focus:border-tiktok-pink"
                 />
@@ -68,7 +133,7 @@ const RegistrationSection = () => {
                   <Wallet className="w-4 h-4" />
                   Akun eWallet
                 </Label>
-                <Select>
+                <Select value={formData.ewallet_type} onValueChange={(value) => handleInputChange('ewallet_type', value)}>
                   <SelectTrigger className="border-2 focus:border-tiktok-pink">
                     <SelectValue placeholder="Pilih eWallet" />
                   </SelectTrigger>
@@ -86,6 +151,8 @@ const RegistrationSection = () => {
               <Label htmlFor="ewallet-number">Nomor eWallet</Label>
               <Input 
                 id="ewallet-number"
+                value={formData.ewallet_number}
+                onChange={(e) => handleInputChange('ewallet_number', e.target.value)}
                 placeholder="08123456789" 
                 className="border-2 focus:border-tiktok-pink"
               />
@@ -101,8 +168,14 @@ const RegistrationSection = () => {
               </ul>
             </div>
             
-            <Button className="w-full" size="lg" variant="tiktok">
-              🔘 Daftar & Mulai Mengupload Video
+            <Button 
+              className="w-full" 
+              size="lg" 
+              variant="tiktok"
+              onClick={handleSubmit}
+              disabled={isLoading}
+            >
+              {isLoading ? "Mendaftar..." : "🔘 Daftar & Mulai Mengupload Video"}
             </Button>
           </CardContent>
         </Card>
