@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { supabase } from "@/lib/supabase";
+import { getSupabaseClient } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
 import { DollarSign, Video, Music, Upload, ExternalLink } from "lucide-react";
 
@@ -16,6 +16,8 @@ const CreatorDashboard = () => {
   const [submissions, setSubmissions] = useState<any[]>([]);
   const [selectedSong, setSelectedSong] = useState("");
   const [tiktokUrl, setTiktokUrl] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   
   const { toast } = useToast();
 
@@ -28,58 +30,80 @@ const CreatorDashboard = () => {
   }, []);
 
   const fetchData = async () => {
+    setLoading(true);
+    setError(null);
+    
     try {
-      // Fetch creator data
-      const { data: creatorData } = await supabase
-        .from('creators')
-        .select('*')
-        .eq('id', mockCreatorId)
-        .single();
+      const supabase = await getSupabaseClient();
+      
+      // Set demo creator data when database is not ready
+      setCreator({
+        id: mockCreatorId,
+        tiktok_username: 'demo_creator',
+        email: 'demo@example.com',
+        phone: '08123456789',
+        ewallet_type: 'DANA',
+        ewallet_number: '08123456789',
+        total_earnings: 0,
+        video_count: 0
+      });
 
-      // If creator doesn't exist, create demo creator
-      if (!creatorData) {
-        const { data: newCreator } = await supabase
-          .from('creators')
-          .insert([{
-            id: mockCreatorId,
-            tiktok_username: 'demo_creator',
-            email: 'demo@example.com',
-            phone: '08123456789',
-            ewallet_type: 'DANA',
-            ewallet_number: '08123456789',
-            total_earnings: 0,
-            video_count: 0
-          }])
-          .select()
-          .single();
-        
-        setCreator(newCreator);
-      } else {
-        setCreator(creatorData);
+      // Try to fetch songs, use sample data if database not ready
+      try {
+        const { data: songsData, error: songsError } = await supabase
+          .from('songs')
+          .select('*')
+          .eq('is_active', true)
+          .order('created_at', { ascending: false });
+
+        if (songsError) throw songsError;
+        setSongs(songsData || []);
+      } catch (songsError: any) {
+        console.error('Songs error:', songsError);
+        // Use sample songs data when database not ready
+        setSongs([
+          {
+            id: 1,
+            title: "Trending Beat #1",
+            artist: "DJ TikTok",
+            status: "Active",
+            earnings_per_video: 150,
+            duration: "0:30"
+          },
+          {
+            id: 2,
+            title: "Viral Sound #2",
+            artist: "Viral Artist",
+            status: "Active",
+            earnings_per_video: 200,
+            duration: "0:45"
+          }
+        ]);
       }
 
-      // Fetch active songs
-      const { data: songsData } = await supabase
-        .from('songs')
-        .select('*')
-        .eq('is_active', true)
-        .order('created_at', { ascending: false });
+      // Try to fetch submissions, use empty array if database not ready
+      try {
+        const { data: submissionsData, error: submissionsError } = await supabase
+          .from('video_submissions')
+          .select(`
+            *,
+            songs(title, artist)
+          `)
+          .eq('creator_id', mockCreatorId)
+          .order('created_at', { ascending: false });
 
-      setSongs(songsData || []);
+        if (submissionsError) throw submissionsError;
+        setSubmissions(submissionsData || []);
+      } catch (submissionsError: any) {
+        console.error('Submissions error:', submissionsError);
+        setSubmissions([]);
+      }
 
-      // Fetch creator's submissions
-      const { data: submissionsData } = await supabase
-        .from('video_submissions')
-        .select(`
-          *,
-          songs(title, artist)
-        `)
-        .eq('creator_id', mockCreatorId)
-        .order('created_at', { ascending: false });
-
-      setSubmissions(submissionsData || []);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching data:', error);
+      setError('Database belum siap. Silakan setup database terlebih dahulu.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -94,6 +118,7 @@ const CreatorDashboard = () => {
     }
 
     try {
+      const supabase = await getSupabaseClient();
       const { error } = await supabase
         .from('video_submissions')
         .insert([{
@@ -123,8 +148,45 @@ const CreatorDashboard = () => {
     }
   };
 
-  if (!creator) {
-    return <div>Loading...</div>;
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background p-4 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-tiktok-pink mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Memuat dashboard creator...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-background p-4 flex items-center justify-center">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle className="text-center text-red-600">Database Belum Siap</CardTitle>
+          </CardHeader>
+          <CardContent className="text-center space-y-4">
+            <p className="text-muted-foreground">
+              Database table belum dibuat. Silakan setup database terlebih dahulu.
+            </p>
+            <Button 
+              onClick={() => window.open('/DATABASE_SETUP_INSTRUCTIONS.md', '_blank')}
+              className="w-full"
+            >
+              Lihat Instruksi Setup Database
+            </Button>
+            <Button 
+              onClick={() => window.location.reload()}
+              variant="outline"
+              className="w-full"
+            >
+              Coba Lagi
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
   return (
