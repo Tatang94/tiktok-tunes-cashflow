@@ -1,16 +1,68 @@
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { supabase } from "@/lib/supabase";
+import { useToast } from "@/hooks/use-toast";
 import { Music, Download, ExternalLink, TrendingUp } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
-import type { Song } from "@shared/schema";
 
 const SongListSection = () => {
-  const { data: songs = [], isLoading, error } = useQuery<Song[]>({
-    queryKey: ['/api/songs/active'],
-    queryFn: () => apiRequest('/api/songs/active'),
-  });
+  const [songs, setSongs] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const { toast } = useToast();
+
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const handleDownload = (song: any) => {
+    if (song.file_url) {
+      window.open(song.file_url, '_blank');
+    } else {
+      toast({
+        title: "File tidak tersedia",
+        description: "File lagu ini sedang dalam proses upload.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleSpotifyLink = (song: any) => {
+    if (song.spotify_url) {
+      window.open(song.spotify_url, '_blank');
+    } else {
+      toast({
+        title: "Link Spotify tidak tersedia",
+        description: "Link Spotify untuk lagu ini belum tersedia.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  useEffect(() => {
+    fetchSongs();
+  }, []);
+
+  const fetchSongs = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('songs')
+        .select('*')
+        .eq('is_active', true)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      setSongs(data || []);
+    } catch (error) {
+      console.error('Error fetching songs:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -22,23 +74,6 @@ const SongListSection = () => {
             </h2>
             <p className="text-xl text-muted-foreground">
               Loading songs...
-            </p>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  if (error) {
-    return (
-      <section className="py-20 px-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              🎵 Daftar Lagu Aktif
-            </h2>
-            <p className="text-xl text-muted-foreground">
-              Error loading songs. Please try again later.
             </p>
           </div>
         </div>
@@ -86,37 +121,29 @@ const SongListSection = () => {
                   </Badge>
                   <div className="flex justify-between text-sm">
                     <span>Durasi: {song.duration}</span>
-                    <span className="font-semibold text-tiktok-pink">Rp {parseFloat(song.earnings_per_video || '100').toLocaleString('id-ID')}/video</span>
+                    <span className="font-semibold text-tiktok-pink">Rp {song.earnings_per_video?.toLocaleString('id-ID') || 100}/video</span>
                   </div>
                 </div>
                 
                 <div className="space-y-2">
-                  {song.file_url ? (
-                    <Button className="w-full" variant="tiktok" asChild>
-                      <a href={song.file_url} target="_blank" rel="noopener noreferrer">
-                        <Download className="w-4 h-4 mr-2" />
-                        Download Lagu
-                      </a>
-                    </Button>
-                  ) : (
-                    <Button className="w-full" variant="tiktok" disabled>
-                      <Download className="w-4 h-4 mr-2" />
-                      Download Lagu
-                    </Button>
-                  )}
-                  {song.spotify_url ? (
-                    <Button className="w-full" variant="outline" asChild>
-                      <a href={song.spotify_url} target="_blank" rel="noopener noreferrer">
-                        <ExternalLink className="w-4 h-4 mr-2" />
-                        Link Spotify
-                      </a>
-                    </Button>
-                  ) : (
-                    <Button className="w-full" variant="outline" disabled>
-                      <ExternalLink className="w-4 h-4 mr-2" />
-                      Link Spotify
-                    </Button>
-                  )}
+                  <Button 
+                    className="w-full" 
+                    variant="tiktok"
+                    onClick={() => handleDownload(song)}
+                    disabled={!song.file_url}
+                  >
+                    <Download className="w-4 h-4 mr-2" />
+                    Download Lagu
+                  </Button>
+                  <Button 
+                    className="w-full" 
+                    variant="outline"
+                    onClick={() => handleSpotifyLink(song)}
+                    disabled={!song.spotify_url}
+                  >
+                    <ExternalLink className="w-4 h-4 mr-2" />
+                    Link Spotify
+                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -128,6 +155,14 @@ const SongListSection = () => {
             <TrendingUp className="w-4 h-4 text-tiktok-pink" />
             <span className="text-sm">Update lagu baru setiap minggu!</span>
           </div>
+          <Button 
+            size="lg" 
+            variant="tiktok" 
+            className="mt-4"
+            onClick={() => scrollToSection('registration-section')}
+          >
+            Daftar Sekarang untuk Akses Semua Lagu
+          </Button>
         </div>
       </div>
     </section>

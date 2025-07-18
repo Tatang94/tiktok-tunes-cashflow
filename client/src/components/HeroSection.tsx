@@ -2,6 +2,13 @@ import { Button } from "@/components/ui/button";
 import { Play, TrendingUp } from "lucide-react";
 
 const HeroSection = () => {
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background Video/Animation Effect */}
@@ -29,10 +36,20 @@ const HeroSection = () => {
         </p>
         
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <Button size="lg" variant="tiktok" className="text-lg px-8 py-6">
+          <Button 
+            size="lg" 
+            variant="tiktok" 
+            className="text-lg px-8 py-6"
+            onClick={() => scrollToSection('registration-section')}
+          >
             🔘 Mulai Sekarang
           </Button>
-          <Button size="lg" variant="outline" className="text-lg px-8 py-6 border-2">
+          <Button 
+            size="lg" 
+            variant="outline" 
+            className="text-lg px-8 py-6 border-2"
+            onClick={() => scrollToSection('how-it-works')}
+          >
             <Play className="w-5 h-5 mr-2" />
             🔘 Lihat Cara Kerja
           </Button>

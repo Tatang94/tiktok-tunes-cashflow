@@ -4,12 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { supabase } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
 import { User, Mail, Phone, Wallet } from "lucide-react";
 import { useLocation } from "wouter";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
-import type { InsertCreator } from "@shared/schema";
 
 const RegistrationSection = () => {
   const [formData, setFormData] = useState({
@@ -19,31 +17,9 @@ const RegistrationSection = () => {
     ewallet_type: "",
     ewallet_number: ""
   });
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const [, setLocation] = useLocation();
-  const queryClient = useQueryClient();
-
-  const createCreatorMutation = useMutation({
-    mutationFn: (data: InsertCreator) => apiRequest('/api/creators', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/creators'] });
-      toast({
-        title: "Pendaftaran Berhasil! 🎉",
-        description: "Akun creator kamu sudah aktif. Yuk mulai upload video!"
-      });
-      setLocation('/creator-dashboard');
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "Error",
-        description: error.message || "Gagal mendaftar. Coba lagi!",
-        variant: "destructive"
-      });
-    }
-  });
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -59,11 +35,38 @@ const RegistrationSection = () => {
       return;
     }
 
-    createCreatorMutation.mutate(formData);
+    setIsLoading(true);
+    try {
+      const { error } = await supabase
+        .from('creators')
+        .insert([{
+          ...formData,
+          total_earnings: 0,
+          video_count: 0
+        }]);
+
+      if (error) throw error;
+
+      toast({
+        title: "Pendaftaran Berhasil! 🎉",
+        description: "Akun creator kamu sudah aktif. Yuk mulai upload video!"
+      });
+
+      // Redirect to creator dashboard
+      setLocation('/creator-dashboard');
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Gagal mendaftar. Coba lagi!",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <section className="py-20 px-4 bg-gradient-to-b from-background to-muted/30">
+    <section id="registration-section" className="py-20 px-4 bg-gradient-to-b from-background to-muted/30">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
@@ -170,9 +173,9 @@ const RegistrationSection = () => {
               size="lg" 
               variant="tiktok"
               onClick={handleSubmit}
-              disabled={createCreatorMutation.isPending}
+              disabled={isLoading}
             >
-              {createCreatorMutation.isPending ? "Mendaftar..." : "🔘 Daftar & Mulai Mengupload Video"}
+              {isLoading ? "Mendaftar..." : "🔘 Daftar & Mulai Mengupload Video"}
             </Button>
           </CardContent>
         </Card>
