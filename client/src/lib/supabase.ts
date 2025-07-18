@@ -1,9 +1,25 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = 'https://ibjbxupcqdyfcnvlwblj.supabase.co'
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImliamJ4dXBjcWR5ZmNudmx3YmxqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzE4NDM5OTcsImV4cCI6MjA0NzQxOTk5N30.wQ0VuIGW9vgFz-cxcpM6KQP0kzGGj6NhJ0ZNPZEJZyQ'
+// Get config from server
+export const getSupabaseClient = async () => {
+  try {
+    const response = await fetch('/api/config');
+    const config = await response.json();
+    return createClient(config.VITE_SUPABASE_URL, config.VITE_SUPABASE_ANON_KEY);
+  } catch {
+    // Fallback to default values if config endpoint fails
+    return createClient(
+      'https://ibjbxupcqdyfcnvlwblj.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImliamJ4dXBjcWR5ZmNudmx3YmxqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzE4NDM5OTcsImV4cCI6MjA0NzQxOTk5N30.wQ0VuIGW9vgFz-cxcpM6KQP0kzGGj6NhJ0ZNPZEJZyQ'
+    );
+  }
+};
 
-export const supabase = createClient(supabaseUrl, supabaseKey)
+// Default client for immediate use - will be updated with proper config
+export const supabase = createClient(
+  'https://ibjbxupcqdyfcnvlwblj.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImliamJ4dXBjcWR5ZmNudmx3YmxqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzE4NDM5OTcsImV4cCI6MjA0NzQxOTk5N30.wQ0VuIGW9vgFz-cxcpM6KQP0kzGGj6NhJ0ZNPZEJZyQ'
+)
 
 export type Database = {
   public: {

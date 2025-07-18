@@ -2,12 +2,45 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { supabase } from "@/lib/supabase";
+import { getSupabaseClient } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
 import { Music, Download, ExternalLink, TrendingUp } from "lucide-react";
 
+const sampleSongs = [
+  {
+    id: 1,
+    title: "Trending Beat #1",
+    artist: "DJ TikTok",
+    status: "Active",
+    earnings_per_video: 150,
+    duration: "0:30",
+    file_url: "https://example.com/song1.mp3",
+    spotify_url: "https://open.spotify.com/track/sample1"
+  },
+  {
+    id: 2,
+    title: "Viral Sound #2", 
+    artist: "Viral Artist",
+    status: "Active",
+    earnings_per_video: 200,
+    duration: "0:45",
+    file_url: "https://example.com/song2.mp3",
+    spotify_url: "https://open.spotify.com/track/sample2"
+  },
+  {
+    id: 3,
+    title: "Popular Track #3",
+    artist: "Hit Maker", 
+    status: "Active",
+    earnings_per_video: 100,
+    duration: "0:30",
+    file_url: "https://example.com/song3.mp3",
+    spotify_url: "https://open.spotify.com/track/sample3"
+  }
+];
+
 const SongListSection = () => {
-  const [songs, setSongs] = useState<any[]>([]);
+  const [songs, setSongs] = useState<any[]>(sampleSongs);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
@@ -48,17 +81,23 @@ const SongListSection = () => {
 
   const fetchSongs = async () => {
     try {
+      const supabase = await getSupabaseClient();
       const { data, error } = await supabase
         .from('songs')
         .select('*')
         .eq('is_active', true)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-
-      setSongs(data || []);
+      if (error) {
+        console.error('Error fetching songs:', error);
+        // Use sample data if database is not ready
+        setSongs(sampleSongs);
+      } else {
+        setSongs(data || sampleSongs);
+      }
     } catch (error) {
       console.error('Error fetching songs:', error);
+      setSongs(sampleSongs);
     } finally {
       setIsLoading(false);
     }

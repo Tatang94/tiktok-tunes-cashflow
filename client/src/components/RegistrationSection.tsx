@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { supabase } from "@/lib/supabase";
+import { getSupabaseClient } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
 import { User, Mail, Phone, Wallet } from "lucide-react";
 import { useLocation } from "wouter";
@@ -37,6 +37,7 @@ const RegistrationSection = () => {
 
     setIsLoading(true);
     try {
+      const supabase = await getSupabaseClient();
       const { error } = await supabase
         .from('creators')
         .insert([{

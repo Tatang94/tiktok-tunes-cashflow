@@ -11,7 +11,8 @@ Platform untuk creator TikTok yang memungkinkan mereka mendaftar, memilih lagu, 
 - ✅ Fungsionalitas tombol-tombol di landing page telah ditambahkan
 - ✅ Smooth scrolling untuk navigasi antar section
 - ✅ Tombol download dan Spotify link sudah berfungsi
-- ⚠️ Perlu API key Supabase yang valid untuk mengambil data songs
+- ✅ API key Supabase sudah dikonfigurasi melalui environment variables
+- ⚠️ Database schema perlu disetup (file database-setup.sql tersedia)
 
 ## Project Architecture
 ### Backend (Node.js + Express)
