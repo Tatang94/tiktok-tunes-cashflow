@@ -1,32 +1,50 @@
-import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { supabase } from "@/lib/supabase";
 import { Music, Download, ExternalLink, TrendingUp } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import type { Song } from "@shared/schema";
 
 const SongListSection = () => {
-  const [songs, setSongs] = useState<any[]>([]);
+  const { data: songs = [], isLoading, error } = useQuery<Song[]>({
+    queryKey: ['/api/songs/active'],
+    queryFn: () => apiRequest('/api/songs/active'),
+  });
 
-  useEffect(() => {
-    fetchSongs();
-  }, []);
+  if (isLoading) {
+    return (
+      <section className="py-20 px-4">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              🎵 Daftar Lagu Aktif
+            </h2>
+            <p className="text-xl text-muted-foreground">
+              Loading songs...
+            </p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
-  const fetchSongs = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('songs')
-        .select('*')
-        .eq('is_active', true)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-
-      setSongs(data || []);
-    } catch (error) {
-      console.error('Error fetching songs:', error);
-    }
-  };
+  if (error) {
+    return (
+      <section className="py-20 px-4">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              🎵 Daftar Lagu Aktif
+            </h2>
+            <p className="text-xl text-muted-foreground">
+              Error loading songs. Please try again later.
+            </p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   const getColorClass = (index: number) => {
     const colors = [
@@ -68,7 +86,7 @@ const SongListSection = () => {
                   </Badge>
                   <div className="flex justify-between text-sm">
                     <span>Durasi: {song.duration}</span>
-                    <span className="font-semibold text-tiktok-pink">Rp {song.earnings_per_video?.toLocaleString('id-ID') || 100}/video</span>
+                    <span className="font-semibold text-tiktok-pink">Rp {parseFloat(song.earnings_per_video || '100').toLocaleString('id-ID')}/video</span>
                   </div>
                 </div>
                 
