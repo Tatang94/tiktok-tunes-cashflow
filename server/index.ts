@@ -9,8 +9,8 @@ app.use(express.urlencoded({ extended: false }));
 // Expose environment variables to frontend
 app.get('/api/config', (req, res) => {
   res.json({
-    VITE_SUPABASE_URL: process.env.SUPABASE_URL,
-    VITE_SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY
+    VITE_SUPABASE_URL: process.env.SUPABASE_URL || '',
+    VITE_SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY || ''
   });
 });
 

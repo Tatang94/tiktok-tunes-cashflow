@@ -43,7 +43,8 @@ const Support = () => {
       responseTime: "< 5 menit",
       icon: MessageCircle,
       status: "online",
-      action: "Mulai Chat"
+      action: "Mulai Chat",
+      link: "https://wa.me/89663596711"
     },
     {
       name: "WhatsApp Support",
@@ -52,7 +53,8 @@ const Support = () => {
       responseTime: "< 15 menit",
       icon: Phone,
       status: "online",
-      action: "Chat WhatsApp"
+      action: "Chat WhatsApp",
+      link: "https://wa.me/89663596711"
     },
     {
       name: "Email Support", 
@@ -61,7 +63,8 @@ const Support = () => {
       responseTime: "1-4 jam",
       icon: Mail,
       status: "online",
-      action: "Kirim Email"
+      action: "Kirim Email",
+      link: "mailto:tatangtaryaedi.tte@gmail.com"
     },
     {
       name: "Video Call",
@@ -225,7 +228,14 @@ const Support = () => {
                         <p className="text-muted-foreground">{channel.responseTime}</p>
                       </div>
                     </div>
-                    <Button className="w-full">
+                    <Button 
+                      className="w-full"
+                      onClick={() => {
+                        if (channel.link) {
+                          window.open(channel.link, '_blank');
+                        }
+                      }}
+                    >
                       {channel.action}
                     </Button>
                   </CardContent>

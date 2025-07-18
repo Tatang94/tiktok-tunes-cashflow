@@ -7,13 +7,14 @@ export const getSupabaseClient = async () => {
     const config = await response.json();
     
     if (!config.VITE_SUPABASE_URL || !config.VITE_SUPABASE_ANON_KEY) {
-      throw new Error('Supabase configuration not found');
+      console.warn('Supabase configuration not found - using fallback mode');
+      return null;
     }
     
     return createClient(config.VITE_SUPABASE_URL, config.VITE_SUPABASE_ANON_KEY);
   } catch (error) {
     console.error('Error getting Supabase client:', error);
-    throw error;
+    return null;
   }
 };
 
