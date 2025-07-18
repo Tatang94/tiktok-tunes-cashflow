@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import Header from "@/components/Header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -197,8 +198,10 @@ const CreatorDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background p-4">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-background">
+      <Header />
+      <div className="pt-20 p-4">
+        <div className="max-w-6xl mx-auto">
         <div className="mb-8 flex justify-between items-center">
           <div>
             <h1 className="text-4xl font-bold mb-2">Creator Dashboard</h1>
@@ -414,6 +417,7 @@ const CreatorDashboard = () => {
             </Table>
           </CardContent>
         </Card>
+        </div>
       </div>
     </div>
   );

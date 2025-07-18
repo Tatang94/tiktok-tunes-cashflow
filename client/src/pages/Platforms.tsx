@@ -1,3 +1,4 @@
+import Header from "@/components/Header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -57,17 +58,12 @@ const Platforms = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background p-4">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <Button 
-            onClick={() => window.history.back()}
-            variant="outline"
-            className="mb-4"
-          >
-            ← Kembali
-          </Button>
+    <div className="min-h-screen bg-background">
+      <Header />
+      <div className="pt-20 p-4">
+        <div className="max-w-6xl mx-auto">
+          {/* Header */}
+          <div className="mb-8">
           <h1 className="text-4xl font-bold mb-4">Platform Creator</h1>
           <p className="text-xl text-muted-foreground">
             Jangkau audience lebih luas dengan berbagai platform social media
@@ -217,6 +213,7 @@ const Platforms = () => {
             </div>
           </CardContent>
         </Card>
+        </div>
       </div>
     </div>
   );

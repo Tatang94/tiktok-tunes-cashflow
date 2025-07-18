@@ -1,3 +1,4 @@
+import Header from "@/components/Header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -64,17 +65,12 @@ const Legal = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background p-4">
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <Button 
-            onClick={() => window.history.back()}
-            variant="outline"
-            className="mb-4"
-          >
-            ← Kembali
-          </Button>
+    <div className="min-h-screen bg-background">
+      <Header />
+      <div className="pt-20 p-4">
+        <div className="max-w-4xl mx-auto">
+          {/* Header */}
+          <div className="mb-8">
           <h1 className="text-4xl font-bold mb-4">Legal & Compliance</h1>
           <p className="text-xl text-muted-foreground">
             Informasi legal, kebijakan, dan ketentuan platform
@@ -257,6 +253,7 @@ const Legal = () => {
             </div>
           </CardContent>
         </Card>
+        </div>
       </div>
     </div>
   );

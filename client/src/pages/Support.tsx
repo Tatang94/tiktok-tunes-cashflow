@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Header from "@/components/Header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -169,24 +170,19 @@ const Support = () => {
   })).filter(category => category.questions.length > 0);
 
   return (
-    <div className="min-h-screen bg-background p-4">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <Button 
-            onClick={() => window.history.back()}
-            variant="outline"
-            className="mb-4"
-          >
-            ← Kembali
-          </Button>
-          <h1 className="text-4xl font-bold mb-4">Support Center</h1>
-          <p className="text-xl text-muted-foreground">
-            Bantuan 24/7 untuk semua kebutuhan creator
-          </p>
-        </div>
+    <div className="min-h-screen bg-background">
+      <Header />
+      <div className="pt-20 p-4">
+        <div className="max-w-6xl mx-auto">
+          {/* Header */}
+          <div className="mb-8">
+            <h1 className="text-4xl font-bold mb-4">Support Center</h1>
+            <p className="text-xl text-muted-foreground">
+              Bantuan 24/7 untuk semua kebutuhan creator
+            </p>
+          </div>
 
-        <Tabs defaultValue="channels" className="space-y-6">
+          <Tabs defaultValue="channels" className="space-y-6">
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="channels">Support Channels</TabsTrigger>
             <TabsTrigger value="faq">FAQ & Help</TabsTrigger>
@@ -536,7 +532,8 @@ const Support = () => {
               </CardContent>
             </Card>
           </TabsContent>
-        </Tabs>
+          </Tabs>
+        </div>
       </div>
     </div>
   );
