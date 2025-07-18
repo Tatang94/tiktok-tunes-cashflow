@@ -319,13 +319,86 @@ const Admin = () => {
         </div>
 
         {/* Main Content Tabs */}
-        <Tabs defaultValue="submissions" className="space-y-6">
+        <Tabs defaultValue="analytics" className="space-y-6">
           <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
             <TabsTrigger value="submissions">Video Submissions</TabsTrigger>
             <TabsTrigger value="songs">Kelola Lagu</TabsTrigger>
             <TabsTrigger value="creators">Creators</TabsTrigger>
-            <TabsTrigger value="analytics">Analytics</TabsTrigger>
           </TabsList>
+
+          {/* Analytics Tab */}
+          <TabsContent value="analytics">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Platform Performance</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex justify-between items-center p-4 bg-muted/30 rounded-lg">
+                    <div>
+                      <p className="font-medium">Total Video Submissions</p>
+                      <p className="text-2xl font-bold text-tiktok-blue">{submissions.length}</p>
+                    </div>
+                    <VideoIcon className="w-8 h-8 text-tiktok-blue" />
+                  </div>
+                  
+                  <div className="flex justify-between items-center p-4 bg-muted/30 rounded-lg">
+                    <div>
+                      <p className="font-medium">Approved Videos</p>
+                      <p className="text-2xl font-bold text-green-500">
+                        {submissions.filter(s => s.status === 'approved').length}
+                      </p>
+                    </div>
+                    <Check className="w-8 h-8 text-green-500" />
+                  </div>
+                  
+                  <div className="flex justify-between items-center p-4 bg-muted/30 rounded-lg">
+                    <div>
+                      <p className="font-medium">Pending Review</p>
+                      <p className="text-2xl font-bold text-orange-500">{stats.pendingSubmissions}</p>
+                    </div>
+                    <X className="w-8 h-8 text-orange-500" />
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Revenue Analytics</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex justify-between items-center p-4 bg-muted/30 rounded-lg">
+                    <div>
+                      <p className="font-medium">Total Earnings Paid</p>
+                      <p className="text-2xl font-bold text-green-500">
+                        Rp {stats.totalEarnings.toLocaleString('id-ID')}
+                      </p>
+                    </div>
+                    <DollarSign className="w-8 h-8 text-green-500" />
+                  </div>
+                  
+                  <div className="flex justify-between items-center p-4 bg-muted/30 rounded-lg">
+                    <div>
+                      <p className="font-medium">Current Rate</p>
+                      <p className="text-lg font-bold text-tiktok-pink">Rp 0,00002489/view</p>
+                    </div>
+                    <Music className="w-8 h-8 text-tiktok-pink" />
+                  </div>
+                  
+                  <div className="flex justify-between items-center p-4 bg-muted/30 rounded-lg">
+                    <div>
+                      <p className="font-medium">Average per Creator</p>
+                      <p className="text-lg font-bold text-tiktok-purple">
+                        Rp {stats.totalCreators > 0 ? Math.round(stats.totalEarnings / stats.totalCreators).toLocaleString('id-ID') : 0}
+                      </p>
+                    </div>
+                    <Users className="w-8 h-8 text-tiktok-purple" />
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
 
           {/* Video Submissions Tab */}
           <TabsContent value="submissions">
@@ -462,7 +535,7 @@ const Admin = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="earnings">Earnings per Video (Rp)</Label>
+                    <Label htmlFor="earnings">Rate per 1000 Views (Rp)</Label>
                     <Input
                       id="earnings"
                       type="number"
@@ -515,7 +588,7 @@ const Admin = () => {
                         </div>
                         <div className="text-sm space-y-1">
                           <p>Durasi: {song.duration}</p>
-                          <p>Earnings: Rp {song.earnings_per_video.toLocaleString('id-ID')}/video</p>
+                          <p>Earnings: Rp 0,00002489/view</p>
                         </div>
                       </div>
                     ))}
@@ -567,43 +640,6 @@ const Admin = () => {
                 </Table>
               </CardContent>
             </Card>
-          </TabsContent>
-
-          {/* Analytics Tab */}
-          <TabsContent value="analytics">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Revenue Overview</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold mb-2">
-                    Rp {stats.totalEarnings.toLocaleString('id-ID')}
-                  </div>
-                  <p className="text-muted-foreground">Total earnings paid to creators</p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Platform Statistics</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex justify-between">
-                    <span>Active Creators:</span>
-                    <span className="font-semibold">{stats.totalCreators}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Available Songs:</span>
-                    <span className="font-semibold">{stats.totalSongs}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Pending Reviews:</span>
-                    <span className="font-semibold">{stats.pendingSubmissions}</span>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
           </TabsContent>
         </Tabs>
       </div>

@@ -29,6 +29,9 @@ Platform untuk creator TikTok yang memungkinkan mereka mendaftar, memilih lagu, 
 - ✅ Supabase credentials dikonfigurasi sebagai environment variables
 - ✅ Support Center diupdate dengan kontak WhatsApp (wa.me/89663596711) dan email (tatangtaryaedi.tte@gmail.com)
 - ✅ Error handling improved untuk Supabase connection fallback
+- ✅ Admin dashboard reorganized dengan 4 tab utama: Analytics, Video Submissions, Kelola Lagu, Creators
+- ✅ Earnings diupdate dari "Rp 100/video" ke "Rp 0,00002489 per view"
+- ✅ Video limit diubah dari "maksimal 50 video per hari" ke "tanpa batas"
 - ⚠️ Database table perlu disetup manual di Supabase (lihat DATABASE_SETUP_INSTRUCTIONS.md)
 
 ## Project Architecture
