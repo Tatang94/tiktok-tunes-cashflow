@@ -14,6 +14,10 @@ Platform untuk creator TikTok yang memungkinkan mereka mendaftar, memilih lagu, 
 - ✅ API key Supabase sudah dikonfigurasi melalui environment variables
 - ✅ Migrasi dari Replit Agent ke Replit environment berhasil diselesaikan
 - ✅ Database schema clean tersedia (database-clean-setup.sql tanpa data sample)
+- ✅ Sistem login admin dengan username: admin, password: audio
+- ✅ Perbaikan tombol "Daftar Creator" dan error handling
+- ✅ Perbaikan styling section Bonus Spesial
+- ⚠️ Database table perlu disetup manual di Supabase (lihat DATABASE_SETUP_INSTRUCTIONS.md)
 
 ## Project Architecture
 ### Backend (Node.js + Express)
