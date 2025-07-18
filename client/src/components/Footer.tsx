@@ -1,19 +1,35 @@
 import { Button } from "@/components/ui/button";
 import { Instagram, Mail, MessageCircle } from "lucide-react";
+import { Link } from "wouter";
 
 const Footer = () => {
   const footerLinks = [
     {
       title: "Platform",
-      links: ["Tentang Kami", "Cara Kerja", "FAQ", "Kontak"]
+      links: [
+        { name: "Platforms", href: "/platforms" },
+        { name: "Creator Dashboard", href: "/creator-dashboard" },
+        { name: "Admin Panel", href: "/admin" },
+        { name: "FAQ", href: "/support" }
+      ]
     },
     {
       title: "Legal", 
-      links: ["Syarat & Ketentuan", "Kebijakan Privasi", "Disclaimer", "DMCA"]
+      links: [
+        { name: "Legal & Compliance", href: "/legal" },
+        { name: "Terms of Service", href: "/legal" },
+        { name: "Privacy Policy", href: "/legal" },
+        { name: "Creator Agreement", href: "/legal" }
+      ]
     },
     {
       title: "Support",
-      links: ["Help Center", "Creator Guidelines", "Payment Info", "Technical Support"]
+      links: [
+        { name: "Support Center", href: "/support" },
+        { name: "Help & FAQ", href: "/support" },
+        { name: "Create Ticket", href: "/support" },
+        { name: "Documentation", href: "/support" }
+      ]
     }
   ];
 
@@ -65,9 +81,12 @@ const Footer = () => {
               <ul className="space-y-2">
                 {section.links.map((link, linkIndex) => (
                   <li key={linkIndex}>
-                    <a href="#" className="text-muted-foreground hover:text-tiktok-pink transition-colors">
-                      {link}
-                    </a>
+                    <Link 
+                      href={link.href} 
+                      className="text-muted-foreground hover:text-tiktok-pink transition-colors"
+                    >
+                      {link.name}
+                    </Link>
                   </li>
                 ))}
               </ul>
