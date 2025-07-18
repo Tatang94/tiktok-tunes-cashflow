@@ -17,6 +17,8 @@ Platform untuk creator TikTok yang memungkinkan mereka mendaftar, memilih lagu, 
 - ✅ Sistem login admin dengan username: admin, password: audio
 - ✅ Perbaikan tombol "Daftar Creator" dan error handling
 - ✅ Perbaikan styling section Bonus Spesial
+- ✅ Form validation ketat untuk TikTok username, email, dan phone
+- ✅ Creator Dashboard dengan fallback handling untuk database yang belum siap
 - ⚠️ Database table perlu disetup manual di Supabase (lihat DATABASE_SETUP_INSTRUCTIONS.md)
 
 ## Project Architecture

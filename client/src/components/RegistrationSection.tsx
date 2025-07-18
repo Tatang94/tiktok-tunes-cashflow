@@ -25,13 +25,65 @@ const RegistrationSection = () => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = async () => {
-    if (!formData.tiktok_username || !formData.email || !formData.phone || !formData.ewallet_type || !formData.ewallet_number) {
+  const validateForm = () => {
+    // Validasi TikTok username (harus dimulai dengan @ dan 3-24 karakter)
+    const tiktokPattern = /^@[a-zA-Z0-9._]{2,23}$/;
+    if (!tiktokPattern.test(formData.tiktok_username)) {
       toast({
-        title: "Error",
-        description: "Semua field harus diisi!",
+        title: "TikTok Username Invalid",
+        description: "Username harus dimulai dengan @ dan terdiri dari 3-24 karakter (huruf, angka, titik, underscore)",
         variant: "destructive"
       });
+      return false;
+    }
+
+    // Validasi email dengan format yang benar
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(formData.email)) {
+      toast({
+        title: "Email Invalid",
+        description: "Masukkan email yang valid (contoh: nama@gmail.com)",
+        variant: "destructive"
+      });
+      return false;
+    }
+
+    // Validasi nomor telepon Indonesia (08xxxxxxxxx atau +62xxxxxxxxx)
+    const phonePattern = /^(\+62|62|0)[8-9][0-9]{8,11}$/;
+    if (!phonePattern.test(formData.phone)) {
+      toast({
+        title: "Nomor Telepon Invalid",
+        description: "Masukkan nomor telepon Indonesia yang valid (contoh: 081234567890)",
+        variant: "destructive"
+      });
+      return false;
+    }
+
+    // Validasi e-wallet number (minimal 10 digit)
+    if (formData.ewallet_number.length < 10 || !/^\d+$/.test(formData.ewallet_number)) {
+      toast({
+        title: "Nomor E-Wallet Invalid",
+        description: "Nomor e-wallet harus berisi minimal 10 digit angka",
+        variant: "destructive"
+      });
+      return false;
+    }
+
+    // Validasi field kosong
+    if (!formData.tiktok_username || !formData.email || !formData.phone || !formData.ewallet_type || !formData.ewallet_number) {
+      toast({
+        title: "Form Belum Lengkap",
+        description: "Semua field harus diisi dengan benar!",
+        variant: "destructive"
+      });
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleSubmit = async () => {
+    if (!validateForm()) {
       return;
     }
 
@@ -119,7 +171,7 @@ const RegistrationSection = () => {
                   id="tiktok-name" 
                   value={formData.tiktok_username}
                   onChange={(e) => handleInputChange('tiktok_username', e.target.value)}
-                  placeholder="@username_tiktok" 
+                  placeholder="@username_tiktok (contoh: @creativegirl123)" 
                   className="border-2 focus:border-tiktok-pink"
                 />
               </div>
@@ -134,7 +186,7 @@ const RegistrationSection = () => {
                   type="email"
                   value={formData.email}
                   onChange={(e) => handleInputChange('email', e.target.value)}
-                  placeholder="email@example.com" 
+                  placeholder="nama@gmail.com (harus email valid)" 
                   className="border-2 focus:border-tiktok-pink"
                 />
               </div>
@@ -148,7 +200,7 @@ const RegistrationSection = () => {
                   id="phone" 
                   value={formData.phone}
                   onChange={(e) => handleInputChange('phone', e.target.value)}
-                  placeholder="08123456789" 
+                  placeholder="081234567890 (nomor Indonesia valid)" 
                   className="border-2 focus:border-tiktok-pink"
                 />
               </div>
@@ -178,7 +230,7 @@ const RegistrationSection = () => {
                 id="ewallet-number"
                 value={formData.ewallet_number}
                 onChange={(e) => handleInputChange('ewallet_number', e.target.value)}
-                placeholder="08123456789" 
+                placeholder="081234567890 (minimal 10 digit angka)" 
                 className="border-2 focus:border-tiktok-pink"
               />
             </div>
