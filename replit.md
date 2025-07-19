@@ -39,6 +39,7 @@ Platform untuk creator TikTok yang memungkinkan mereka mendaftar, memilih lagu, 
 - ✅ Database schema update untuk Supabase dengan sistem referral lengkap
 - ✅ File database-supabase-setup.sql telah dibuat untuk migrasi
 - ✅ Vercel deployment configuration fixed dengan perbaikan 404 error
+- ✅ API endpoints menggunakan Supabase langsung (tanpa mock data)
 - ✅ Fullstack app dapat di-deploy ke Vercel dengan proper API routing
 - ⚠️ Database table perlu disetup manual di Supabase (lihat SUPABASE_MIGRATION_GUIDE.md)
 

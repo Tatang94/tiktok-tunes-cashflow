@@ -1,5 +1,5 @@
 import express, { type Request, Response, NextFunction } from "express";
-import path from "path";
+import { createClient } from '@supabase/supabase-js';
 import { z } from "zod";
 
 const app = express();
@@ -44,23 +44,15 @@ app.use((req, res, next) => {
   next();
 });
 
-// Mock storage for deployment (since we can't access server files)
-const mockStorage = {
-  getAllCreators: async () => [],
-  createCreator: async (data: any) => ({ id: 1, ...data, referral_code: `REF${Date.now()}` }),
-  getActiveSongs: async () => [
-    { id: 1, title: "Trending Beat #1", artist: "Artist A", earnings_per_video: 150, status: "available" },
-    { id: 2, title: "Viral Sound #2", artist: "Artist B", earnings_per_video: 200, status: "available" },
-    { id: 3, title: "Popular Track #3", artist: "Artist C", earnings_per_video: 100, status: "available" }
-  ],
-  getReferralByCode: async (code: string) => {
-    if (code === 'TEST123') {
-      return { id: 1, tiktok_username: '@testuser', referral_code: 'TEST123' };
-    }
-    return null;
-  },
-  getReferralCount: async (creatorId: number) => 5
-};
+// Initialize Supabase client
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseKey) {
+  console.error('Missing Supabase environment variables');
+}
+
+const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null;
 
 // API routes with validation schemas
 const insertCreatorSchema = z.object({
@@ -75,42 +67,103 @@ const insertCreatorSchema = z.object({
 // Register API routes
 app.get("/api/creators", async (req, res) => {
   try {
-    const creators = await mockStorage.getAllCreators();
+    if (!supabase) {
+      return res.status(500).json({ error: "Database not configured" });
+    }
+    
+    const { data: creators, error } = await supabase
+      .from('creators')
+      .select('*');
+    
+    if (error) {
+      console.error('Supabase error:', error);
+      return res.status(500).json({ error: "Failed to fetch creators" });
+    }
+    
     res.json(creators);
   } catch (error) {
+    console.error('API error:', error);
     res.status(500).json({ error: "Failed to fetch creators" });
   }
 });
 
 app.post("/api/creators", async (req, res) => {
   try {
+    if (!supabase) {
+      return res.status(500).json({ error: "Database not configured" });
+    }
+    
     const validatedData = insertCreatorSchema.parse(req.body);
-    const creator = await mockStorage.createCreator(validatedData);
+    
+    // Generate referral code
+    const referralCode = `REF${Date.now().toString().slice(-6)}`;
+    
+    const { data: creator, error } = await supabase
+      .from('creators')
+      .insert([{
+        ...validatedData,
+        referral_code: referralCode,
+        total_earnings: 0,
+        video_count: 0
+      }])
+      .select()
+      .single();
+    
+    if (error) {
+      console.error('Supabase error:', error);
+      return res.status(500).json({ error: "Failed to create creator" });
+    }
+    
     res.status(201).json(creator);
   } catch (error) {
     if (error instanceof z.ZodError) {
       return res.status(400).json({ error: "Invalid data", details: error.errors });
     }
+    console.error('API error:', error);
     res.status(500).json({ error: "Failed to create creator" });
   }
 });
 
 app.get("/api/songs", async (req, res) => {
   try {
-    const songs = await mockStorage.getActiveSongs();
+    if (!supabase) {
+      return res.status(500).json({ error: "Database not configured" });
+    }
+    
+    const { data: songs, error } = await supabase
+      .from('songs')
+      .select('*')
+      .eq('is_active', true);
+    
+    if (error) {
+      console.error('Supabase error:', error);
+      return res.status(500).json({ error: "Failed to fetch songs" });
+    }
+    
     res.json(songs);
   } catch (error) {
+    console.error('API error:', error);
     res.status(500).json({ error: "Failed to fetch songs" });
   }
 });
 
 app.get("/api/referrals/validate/:code", async (req, res) => {
   try {
+    if (!supabase) {
+      return res.status(500).json({ error: "Database not configured" });
+    }
+    
     const code = req.params.code;
-    const referrer = await mockStorage.getReferralByCode(code);
-    if (!referrer) {
+    const { data: referrer, error } = await supabase
+      .from('creators')
+      .select('id, tiktok_username, referral_code')
+      .eq('referral_code', code)
+      .single();
+    
+    if (error || !referrer) {
       return res.status(404).json({ error: "Invalid referral code" });
     }
+    
     res.json({ 
       valid: true, 
       referrer: {
@@ -120,16 +173,31 @@ app.get("/api/referrals/validate/:code", async (req, res) => {
       }
     });
   } catch (error) {
+    console.error('API error:', error);
     res.status(500).json({ error: "Failed to validate referral code" });
   }
 });
 
 app.get("/api/referrals/count/:creatorId", async (req, res) => {
   try {
-    const creatorId = parseInt(req.params.creatorId);
-    const count = await mockStorage.getReferralCount(creatorId);
-    res.json({ count });
+    if (!supabase) {
+      return res.status(500).json({ error: "Database not configured" });
+    }
+    
+    const creatorId = req.params.creatorId;
+    const { count, error } = await supabase
+      .from('referrals')
+      .select('*', { count: 'exact', head: true })
+      .eq('referrer_id', creatorId);
+    
+    if (error) {
+      console.error('Supabase error:', error);
+      return res.status(500).json({ error: "Failed to get referral count" });
+    }
+    
+    res.json({ count: count || 0 });
   } catch (error) {
+    console.error('API error:', error);
     res.status(500).json({ error: "Failed to get referral count" });
   }
 });

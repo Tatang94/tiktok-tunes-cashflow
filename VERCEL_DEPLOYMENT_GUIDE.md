@@ -105,6 +105,15 @@ Environments: ✓ Production ✓ Preview ✓ Development
 - `SUPABASE_URL` (bukan VITE_SUPABASE_URL)
 - `SUPABASE_ANON_KEY` (bukan VITE_SUPABASE_ANON_KEY)
 
+**Error: "Database not configured"**
+✅ **Solusi**: Pastikan environment variables Supabase sudah di-set dengan benar di Vercel
+
+## ⚠️ PENTING: Setup Database
+Sebelum menggunakan aplikasi:
+1. Buat database tables di Supabase menggunakan `database-supabase-setup.sql`
+2. Set environment variables di Vercel
+3. Aplikasi akan menggunakan data asli dari Supabase (bukan mock data)
+
 ## Yang Akan Bekerja Setelah Deploy:
 - ✅ Frontend React akan ter-render dengan benar
 - ✅ API endpoints akan accessible di `/api/*`
