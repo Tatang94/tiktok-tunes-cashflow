@@ -1,10 +1,12 @@
 {
   "version": 2,
-  "buildCommand": "node build.js",
   "builds": [
     {
-      "src": "dist/**",
-      "use": "@vercel/static"
+      "src": "package.json",
+      "use": "@vercel/node",
+      "config": {
+        "buildCommand": "npm run build"
+      }
     },
     {
       "src": "api/index.ts",
@@ -17,7 +19,7 @@
       "destination": "/api/index.ts"
     },
     {
-      "source": "/((?!api).*)",
+      "source": "/(.*)",
       "destination": "/dist/index.html"
     }
   ]
