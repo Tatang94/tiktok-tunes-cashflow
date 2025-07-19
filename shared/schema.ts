@@ -46,7 +46,7 @@ export const referrals = pgTable("referrals", {
   referrer_id: integer("referrer_id").references(() => creators.id).notNull(),
   referred_id: integer("referred_id").references(() => creators.id).notNull(),
   referral_code: text("referral_code").notNull(),
-  bonus_amount: numeric("bonus_amount", { precision: 10, scale: 2 }).default("50000"),
+  bonus_amount: numeric("bonus_amount", { precision: 10, scale: 2 }).default("500"),
   status: text("status", { enum: ["pending", "paid"] }).default("pending"),
   created_at: timestamp("created_at").defaultNow(),
 });

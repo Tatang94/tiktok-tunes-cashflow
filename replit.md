@@ -35,8 +35,10 @@ Platform untuk creator TikTok yang memungkinkan mereka mendaftar, memilih lagu, 
 - ✅ Layout website dikunci agar tidak geser dengan CSS fixes
 - ✅ Program referral difungsikan di Creator Dashboard dengan kode unik per creator
 - ✅ Fitur share referral via WhatsApp dan copy link/pesan
-- ✅ Stats referral dengan bonus Rp 50.000 per referral berhasil
-- ⚠️ Database table perlu disetup manual di Supabase (lihat DATABASE_SETUP_INSTRUCTIONS.md)
+- ✅ Stats referral dengan bonus Rp 500 per referral berhasil (UPDATED)
+- ✅ Database schema update untuk Supabase dengan sistem referral lengkap
+- ✅ File database-supabase-setup.sql telah dibuat untuk migrasi
+- ⚠️ Database table perlu disetup manual di Supabase (lihat SUPABASE_MIGRATION_GUIDE.md)
 
 ## Project Architecture
 ### Backend (Node.js + Express)

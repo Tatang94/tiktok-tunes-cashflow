@@ -457,7 +457,7 @@ const RegistrationSection = () => {
                           setReferrerInfo(null);
                         }
                       }}
-                      placeholder="CREATOR-REF-123 (dapat bonus Rp 50.000)" 
+                      placeholder="CREATOR-REF-123 (dapat bonus Rp 500)" 
                       className="border-2 focus:border-tiktok-pink flex-1"
                     />
                     {validatingReferral && (

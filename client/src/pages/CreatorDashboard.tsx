@@ -381,11 +381,11 @@ const CreatorDashboard = () => {
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between p-2 bg-muted rounded">
                       <span>Per referral berhasil:</span>
-                      <span className="font-semibold text-tiktok-pink">Rp 50.000</span>
+                      <span className="font-semibold text-tiktok-pink">Rp 500</span>
                     </div>
                     <div className="flex justify-between p-2 bg-muted rounded">
                       <span>Total earned:</span>
-                      <span className="font-semibold text-green-600">Rp {(referralCount * 50000).toLocaleString('id-ID')}</span>
+                      <span className="font-semibold text-green-600">Rp {(referralCount * 500).toLocaleString('id-ID')}</span>
                     </div>
                   </div>
                 </div>

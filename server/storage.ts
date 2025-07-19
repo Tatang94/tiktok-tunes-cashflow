@@ -120,7 +120,7 @@ export class MemStorage implements IStorage {
           referrer_id: insertCreator.referred_by,
           referred_id: id,
           referral_code: referrer.referral_code || '',
-          bonus_amount: "50000",
+          bonus_amount: "500",
           status: "pending"
         });
       }
