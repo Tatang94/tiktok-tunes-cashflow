@@ -200,7 +200,7 @@ const SongListSection = () => {
             className="mt-4"
             onClick={() => scrollToSection('registration-section')}
           >
-            Daftar Sekarang untuk Akses Semua Lagu
+            Daftar Sekarang
           </Button>
         </div>
       </div>
