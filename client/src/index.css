@@ -2,6 +2,54 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Fixed layout styles */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100%;
+}
+
+.container {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Grid and layout fixes */
+.grid {
+  width: 100%;
+}
+
+.grid > * {
+  min-width: 0;
+}
+
+/* Responsive container fixes */
+@media (max-width: 768px) {
+  .container, .max-w-6xl, .max-w-7xl {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  .grid-cols-1 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Button and input fixes */
+button, input, select, textarea {
+  max-width: 100%;
+}
+
+/* Code block fixes */
+code {
+  word-break: break-all;
+  max-width: 100%;
+}
+
 /* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
 All colors MUST be HSL.
 */

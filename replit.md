@@ -32,6 +32,10 @@ Platform untuk creator TikTok yang memungkinkan mereka mendaftar, memilih lagu, 
 - ✅ Admin dashboard reorganized dengan 4 tab utama: Analytics, Video Submissions, Kelola Lagu, Creators
 - ✅ Earnings diupdate dari "Rp 100/video" ke "Rp 0,00002489 per view"
 - ✅ Video limit diubah dari "maksimal 50 video per hari" ke "tanpa batas"
+- ✅ Layout website dikunci agar tidak geser dengan CSS fixes
+- ✅ Program referral difungsikan di Creator Dashboard dengan kode unik per creator
+- ✅ Fitur share referral via WhatsApp dan copy link/pesan
+- ✅ Stats referral dengan bonus Rp 50.000 per referral berhasil
 - ⚠️ Database table perlu disetup manual di Supabase (lihat DATABASE_SETUP_INSTRUCTIONS.md)
 
 ## Project Architecture

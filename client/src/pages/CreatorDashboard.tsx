@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getSupabaseClient } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
-import { DollarSign, Video, Music, Upload, ExternalLink } from "lucide-react";
+import { DollarSign, Video, Music, Upload, ExternalLink, Users, Copy, Share2, User } from "lucide-react";
 
 const CreatorDashboard = () => {
   const [creator, setCreator] = useState<any>(null);
@@ -19,6 +19,7 @@ const CreatorDashboard = () => {
   const [tiktokUrl, setTiktokUrl] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [referralCount, setReferralCount] = useState(0);
   
   const { toast } = useToast();
 
@@ -55,6 +56,9 @@ const CreatorDashboard = () => {
           video_count: 0
         });
       }
+
+      // Set referral count (in real app, this would be fetched from database)
+      setReferralCount(Math.floor(Math.random() * 10) + 2);
 
       // Try to fetch songs, use sample data if database not ready
       try {
@@ -198,10 +202,10 @@ const CreatorDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background w-full overflow-x-hidden">
       <Header />
-      <div className="pt-20 p-4">
-        <div className="max-w-6xl mx-auto">
+      <div className="pt-20 p-4 w-full">
+        <div className="max-w-6xl mx-auto w-full">
         <div className="mb-8 flex justify-between items-center">
           <div>
             <h1 className="text-4xl font-bold mb-2">Creator Dashboard</h1>
@@ -221,7 +225,7 @@ const CreatorDashboard = () => {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <Card>
             <CardContent className="p-6">
               <div className="flex items-center gap-4">
@@ -257,7 +261,144 @@ const CreatorDashboard = () => {
               </div>
             </CardContent>
           </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center gap-4">
+                <Users className="w-8 h-8 text-tiktok-blue" />
+                <div>
+                  <p className="text-sm text-muted-foreground">Referrals</p>
+                  <p className="text-2xl font-bold">{referralCount}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
+
+        {/* Referral Section */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Share2 className="w-5 h-5" />
+              Program Referral
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <div className="bg-gradient-to-r from-tiktok-pink/10 to-tiktok-purple/10 p-4 rounded-lg border">
+                  <h4 className="font-semibold mb-2">Kode Referral Kamu</h4>
+                  <div className="flex items-center gap-2">
+                    <code className="bg-background px-3 py-2 rounded border font-mono text-sm flex-1">
+                      {creator.tiktok_username?.toUpperCase()}-REF-{creator.id || 'DEMO'}
+                    </code>
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => {
+                        navigator.clipboard.writeText(`${creator.tiktok_username?.toUpperCase()}-REF-${creator.id || 'DEMO'}`);
+                        toast({
+                          title: "Copied!",
+                          description: "Kode referral berhasil disalin"
+                        });
+                      }}
+                    >
+                      <Copy className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <h4 className="font-semibold">Link Referral</h4>
+                  <div className="flex items-center gap-2">
+                    <input 
+                      type="text" 
+                      readOnly 
+                      value={`${window.location.origin}/?ref=${creator.tiktok_username?.toUpperCase()}-REF-${creator.id || 'DEMO'}`}
+                      className="flex-1 px-3 py-2 border rounded text-sm bg-background"
+                    />
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => {
+                        navigator.clipboard.writeText(`${window.location.origin}/?ref=${creator.tiktok_username?.toUpperCase()}-REF-${creator.id || 'DEMO'}`);
+                        toast({
+                          title: "Copied!",
+                          description: "Link referral berhasil disalin"
+                        });
+                      }}
+                    >
+                      <Copy className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="flex gap-2">
+                  <Button 
+                    variant="outline" 
+                    className="flex-1"
+                    onClick={() => {
+                      const text = `🎵 Join Soundtrack Tok dan dapatkan penghasilan dari video TikTok kamu!\n\nDaftar pakai kode referral: ${creator.tiktok_username?.toUpperCase()}-REF-${creator.id || 'DEMO'}\n\nLink: ${window.location.origin}/?ref=${creator.tiktok_username?.toUpperCase()}-REF-${creator.id || 'DEMO'}`;
+                      navigator.clipboard.writeText(text);
+                      toast({
+                        title: "Copied!",
+                        description: "Pesan referral berhasil disalin untuk dibagikan"
+                      });
+                    }}
+                  >
+                    Copy Pesan
+                  </Button>
+                  <Button 
+                    className="flex-1"
+                    onClick={() => {
+                      const text = `🎵 Join Soundtrack Tok dan dapatkan penghasilan dari video TikTok kamu!\n\nDaftar pakai kode referral: ${creator.tiktok_username?.toUpperCase()}-REF-${creator.id || 'DEMO'}\n\nLink: ${window.location.origin}/?ref=${creator.tiktok_username?.toUpperCase()}-REF-${creator.id || 'DEMO'}`;
+                      const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
+                      window.open(whatsappUrl, '_blank');
+                    }}
+                  >
+                    Share WhatsApp
+                  </Button>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <h4 className="font-semibold mb-2">Bonus Referral</h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between p-2 bg-muted rounded">
+                      <span>Per referral berhasil:</span>
+                      <span className="font-semibold text-tiktok-pink">Rp 50.000</span>
+                    </div>
+                    <div className="flex justify-between p-2 bg-muted rounded">
+                      <span>Total earned:</span>
+                      <span className="font-semibold text-green-600">Rp {(referralCount * 50000).toLocaleString('id-ID')}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold mb-2">Referral Stats</h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span>Total referrals:</span>
+                      <span className="font-semibold">{referralCount}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>This month:</span>
+                      <span className="font-semibold">{Math.floor(referralCount / 2)}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-tiktok-blue/10 p-3 rounded-lg">
+                  <p className="text-xs text-muted-foreground">
+                    💡 <strong>Tips:</strong> Share kode referral kamu di bio TikTok, Instagram Story, atau grup WhatsApp untuk mendapat lebih banyak referral!
+                  </p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Submit New Video */}
