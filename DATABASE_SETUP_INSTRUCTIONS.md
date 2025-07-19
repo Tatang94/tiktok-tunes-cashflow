@@ -1,91 +1,44 @@
 # Setup Database Supabase untuk TikTok Creator Platform
 
+## ⚠️ GUNAKAN FILE SQL YANG BARU: `database-supabase-setup.sql`
+
+Instruksi ini telah diperbarui untuk menggunakan schema database yang baru dengan sistem referral lengkap.
+
 ## Langkah-langkah Setup Database:
 
 ### 1. Buka Supabase Dashboard
-- Login ke dashboard Supabase Anda
+- Login ke [Supabase Dashboard](https://supabase.com/dashboard)
 - Pilih project yang sudah dikonfigurasi dengan API key yang ada
 
-### 2. Jalankan SQL Script
+### 2. Jalankan SQL Script Baru
 - Buka **SQL Editor** di dashboard Supabase
-- Copy dan paste script berikut ini:
+- **HAPUS semua table lama jika ada**
+- Copy dan paste **SELURUH ISI** file `database-supabase-setup.sql`
+- Jalankan script tersebut
 
-```sql
--- Create the creators table
-CREATE TABLE IF NOT EXISTS public.creators (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  tiktok_username VARCHAR(255) NOT NULL UNIQUE,
-  email VARCHAR(255) NOT NULL UNIQUE,
-  phone VARCHAR(20) NOT NULL,
-  ewallet_type VARCHAR(50) NOT NULL,
-  ewallet_number VARCHAR(100) NOT NULL,
-  total_earnings DECIMAL(10,2) DEFAULT 0,
-  video_count INTEGER DEFAULT 0,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
+### 3. Verifikasi Tables Baru
+Setelah menjalankan script, pastikan tables berikut telah dibuat:
+- `creators` (dengan field referral: referral_code, referred_by, referral_earnings)
+- `songs` 
+- `video_submissions`
+- `referrals` (table baru untuk tracking referral dengan bonus Rp 500)
 
--- Create the songs table
-CREATE TABLE IF NOT EXISTS public.songs (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  title VARCHAR(255) NOT NULL,
-  artist VARCHAR(255) NOT NULL,
-  status VARCHAR(50) DEFAULT 'Active',
-  earnings_per_video DECIMAL(8,2) DEFAULT 100,
-  duration VARCHAR(20) DEFAULT '0:30',
-  file_url TEXT,
-  spotify_url TEXT,
-  is_active BOOLEAN DEFAULT true,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
+### 4. Set Environment Variable
+1. Di Supabase dashboard, klik **Connect**
+2. Copy **URI** dari section "Connection string" → "Transaction pooler"
+3. Replace `[YOUR-PASSWORD]` dengan password database project Anda
+4. Set sebagai environment variable `DATABASE_URL` di Replit
 
--- Create the video_submissions table
-CREATE TABLE IF NOT EXISTS public.video_submissions (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  creator_id UUID REFERENCES public.creators(id) ON DELETE CASCADE,
-  song_id UUID REFERENCES public.songs(id) ON DELETE CASCADE,
-  tiktok_url TEXT NOT NULL,
-  status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')),
-  earnings DECIMAL(8,2) DEFAULT 0,
-  admin_notes TEXT,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
+## Fitur Baru di Database Schema:
+- ✅ Sistem referral lengkap dengan tracking
+- ✅ Bonus referral Rp 500 per referral berhasil
+- ✅ Auto-generate referral code untuk setiap creator
+- ✅ Trigger otomatis untuk bonus referral
+- ✅ RLS (Row Level Security) sudah dikonfigurasi
+- ✅ Indexes untuk performa optimal
 
--- Enable Row Level Security
-ALTER TABLE public.creators ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.songs ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.video_submissions ENABLE ROW LEVEL SECURITY;
+## Sample Data
+File `database-supabase-setup.sql` sudah include sample songs dan 1 test creator untuk testing platform.
 
--- Create policies for public access
-CREATE POLICY "Enable read access for all users" ON public.songs FOR SELECT USING (true);
-CREATE POLICY "Enable insert for all users" ON public.creators FOR INSERT WITH CHECK (true);
-CREATE POLICY "Enable read access for creators" ON public.creators FOR SELECT USING (true);
-CREATE POLICY "Enable insert for all users" ON public.video_submissions FOR INSERT WITH CHECK (true);
-CREATE POLICY "Enable read access for video submissions" ON public.video_submissions FOR SELECT USING (true);
-CREATE POLICY "Enable update for creators" ON public.creators FOR UPDATE USING (true);
-CREATE POLICY "Enable update for songs" ON public.songs FOR UPDATE USING (true);
-CREATE POLICY "Enable update for video submissions" ON public.video_submissions FOR UPDATE USING (true);
-```
-
-### 3. Klik "Run" untuk mengeksekusi script
-
-### 4. Verifikasi Setup
-Setelah berhasil, Anda akan melihat 3 table baru:
-- `creators` - untuk data creator TikTok
-- `songs` - untuk data lagu
-- `video_submissions` - untuk data video yang disubmit
-
-### 5. Test Platform
-Setelah database siap, coba:
-1. Daftar sebagai creator baru
-2. Akses halaman admin (`/admin`) dengan login admin/audio
-3. Tambah lagu baru melalui admin panel
-
-## File SQL Alternatif
-Jika ingin menggunakan file SQL yang sudah ada:
-- `database-setup.sql` - dengan data sample
-- `database-clean-setup.sql` - tanpa data sample (recommended)
-
-## Troubleshooting
-- Jika ada error "relation does not exist", pastikan script SQL sudah dijalankan
-- Jika ada error permission, pastikan RLS policies sudah aktif
-- Jika masih ada masalah, cek di tab "Logs" di dashboard Supabase
+---
+**Catatan**: File ini menggantikan semua setup database sebelumnya. Gunakan hanya `database-supabase-setup.sql` untuk setup yang baru.
