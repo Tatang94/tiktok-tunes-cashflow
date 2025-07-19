@@ -92,6 +92,19 @@ Environments: ✓ Production ✓ Preview ✓ Development
 
 ⚠️ **Setelah menambah environment variables, Anda HARUS redeploy!**
 
+### ⚠️ Troubleshooting Deploy Errors:
+
+**Error: "routes cannot be present"**
+✅ **Sudah diperbaiki** - Konfigurasi vercel.json sudah diupdate untuk menghindari konflik routes vs rewrites
+
+**Error: "name contains invalid characters"**  
+✅ **Solusi**: Gunakan nama `tiktok_creator_platform` (dengan underscore)
+
+**Error: Environment Variables tidak cocok**
+✅ **Solusi**: Gunakan nama variables yang tepat:
+- `SUPABASE_URL` (bukan VITE_SUPABASE_URL)
+- `SUPABASE_ANON_KEY` (bukan VITE_SUPABASE_ANON_KEY)
+
 ## Yang Akan Bekerja Setelah Deploy:
 - ✅ Frontend React akan ter-render dengan benar
 - ✅ API endpoints akan accessible di `/api/*`
