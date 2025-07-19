@@ -2,12 +2,15 @@ import {
   creators, 
   songs, 
   video_submissions,
+  referrals,
   type Creator, 
   type Song, 
   type VideoSubmission,
+  type Referral,
   type InsertCreator, 
   type InsertSong, 
-  type InsertVideoSubmission 
+  type InsertVideoSubmission,
+  type InsertReferral
 } from "@shared/schema";
 
 export interface IStorage {
@@ -31,23 +34,34 @@ export interface IStorage {
   getAllVideoSubmissions(): Promise<VideoSubmission[]>;
   createVideoSubmission(submission: InsertVideoSubmission): Promise<VideoSubmission>;
   updateVideoSubmission(id: number, updates: Partial<InsertVideoSubmission>): Promise<VideoSubmission | undefined>;
+
+  // Referral methods
+  getReferral(id: number): Promise<Referral | undefined>;
+  getReferralsByReferrer(referrerId: number): Promise<Referral[]>;
+  getReferralByCode(code: string): Promise<Creator | undefined>;
+  createReferral(referral: InsertReferral): Promise<Referral>;
+  getReferralCount(referrerId: number): Promise<number>;
 }
 
 export class MemStorage implements IStorage {
   private creators: Map<number, Creator>;
   private songs: Map<number, Song>;
   private videoSubmissions: Map<number, VideoSubmission>;
+  private referrals: Map<number, Referral>;
   private currentCreatorId: number;
   private currentSongId: number;
   private currentSubmissionId: number;
+  private currentReferralId: number;
 
   constructor() {
     this.creators = new Map();
     this.songs = new Map();
     this.videoSubmissions = new Map();
+    this.referrals = new Map();
     this.currentCreatorId = 1;
     this.currentSongId = 1;
     this.currentSubmissionId = 1;
+    this.currentReferralId = 1;
     
     // Initialize with sample data
     this.initializeSampleData();
@@ -85,14 +99,33 @@ export class MemStorage implements IStorage {
 
   async createCreator(insertCreator: InsertCreator): Promise<Creator> {
     const id = this.currentCreatorId++;
+    const referralCode = `${insertCreator.tiktok_username?.replace('@', '').toUpperCase()}-REF-${id}`;
+    
     const creator: Creator = { 
       ...insertCreator, 
       id, 
       total_earnings: "0",
       video_count: 0,
+      referral_code: referralCode,
+      referral_earnings: "0",
       created_at: new Date() 
     };
     this.creators.set(id, creator);
+    
+    // If there's a referrer, create a referral record
+    if (insertCreator.referred_by) {
+      const referrer = await this.getCreator(insertCreator.referred_by);
+      if (referrer) {
+        await this.createReferral({
+          referrer_id: insertCreator.referred_by,
+          referred_id: id,
+          referral_code: referrer.referral_code || '',
+          bonus_amount: "50000",
+          status: "pending"
+        });
+      }
+    }
+    
     return creator;
   }
 
@@ -177,6 +210,40 @@ export class MemStorage implements IStorage {
     const updatedSubmission = { ...submission, ...updates };
     this.videoSubmissions.set(id, updatedSubmission);
     return updatedSubmission;
+  }
+
+  // Referral methods
+  async getReferral(id: number): Promise<Referral | undefined> {
+    return this.referrals.get(id);
+  }
+
+  async getReferralsByReferrer(referrerId: number): Promise<Referral[]> {
+    return Array.from(this.referrals.values()).filter(
+      (referral) => referral.referrer_id === referrerId
+    );
+  }
+
+  async getReferralByCode(code: string): Promise<Creator | undefined> {
+    return Array.from(this.creators.values()).find(
+      (creator) => creator.referral_code === code
+    );
+  }
+
+  async createReferral(insertReferral: InsertReferral): Promise<Referral> {
+    const id = this.currentReferralId++;
+    const referral: Referral = {
+      ...insertReferral,
+      id,
+      created_at: new Date()
+    };
+    this.referrals.set(id, referral);
+    return referral;
+  }
+
+  async getReferralCount(referrerId: number): Promise<number> {
+    return Array.from(this.referrals.values()).filter(
+      (referral) => referral.referrer_id === referrerId
+    ).length;
   }
 }
 

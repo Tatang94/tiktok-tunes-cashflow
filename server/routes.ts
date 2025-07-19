@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertCreatorSchema, insertSongSchema, insertVideoSubmissionSchema } from "@shared/schema";
+import { insertCreatorSchema, insertSongSchema, insertVideoSubmissionSchema, insertReferralSchema } from "@shared/schema";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -154,6 +154,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Invalid data", details: error.errors });
       }
       res.status(500).json({ error: "Failed to update submission" });
+    }
+  });
+
+  // Referral routes
+  app.get("/api/referrals/validate/:code", async (req, res) => {
+    try {
+      const code = req.params.code;
+      const referrer = await storage.getReferralByCode(code);
+      if (!referrer) {
+        return res.status(404).json({ error: "Invalid referral code" });
+      }
+      res.json({ 
+        valid: true, 
+        referrer: {
+          id: referrer.id,
+          tiktok_username: referrer.tiktok_username,
+          referral_code: referrer.referral_code
+        }
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to validate referral code" });
+    }
+  });
+
+  app.get("/api/referrals/count/:creatorId", async (req, res) => {
+    try {
+      const creatorId = parseInt(req.params.creatorId);
+      const count = await storage.getReferralCount(creatorId);
+      res.json({ count });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to get referral count" });
+    }
+  });
+
+  app.get("/api/referrals/creator/:creatorId", async (req, res) => {
+    try {
+      const creatorId = parseInt(req.params.creatorId);
+      const referrals = await storage.getReferralsByReferrer(creatorId);
+      res.json(referrals);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch referrals" });
     }
   });
 

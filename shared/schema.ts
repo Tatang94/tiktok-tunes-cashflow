@@ -11,6 +11,9 @@ export const creators = pgTable("creators", {
   ewallet_number: text("ewallet_number").notNull(),
   total_earnings: numeric("total_earnings", { precision: 10, scale: 2 }).default("0"),
   video_count: integer("video_count").default(0),
+  referral_code: text("referral_code"),
+  referred_by: integer("referred_by").references(() => creators.id),
+  referral_earnings: numeric("referral_earnings", { precision: 10, scale: 2 }).default("0"),
   created_at: timestamp("created_at").defaultNow(),
 });
 
@@ -38,6 +41,16 @@ export const video_submissions = pgTable("video_submissions", {
   created_at: timestamp("created_at").defaultNow(),
 });
 
+export const referrals = pgTable("referrals", {
+  id: serial("id").primaryKey(),
+  referrer_id: integer("referrer_id").references(() => creators.id).notNull(),
+  referred_id: integer("referred_id").references(() => creators.id).notNull(),
+  referral_code: text("referral_code").notNull(),
+  bonus_amount: numeric("bonus_amount", { precision: 10, scale: 2 }).default("50000"),
+  status: text("status", { enum: ["pending", "paid"] }).default("pending"),
+  created_at: timestamp("created_at").defaultNow(),
+});
+
 // Insert schemas
 export const insertCreatorSchema = createInsertSchema(creators).omit({
   id: true,
@@ -54,6 +67,11 @@ export const insertVideoSubmissionSchema = createInsertSchema(video_submissions)
   created_at: true,
 });
 
+export const insertReferralSchema = createInsertSchema(referrals).omit({
+  id: true,
+  created_at: true,
+});
+
 // Types
 export type InsertCreator = z.infer<typeof insertCreatorSchema>;
 export type Creator = typeof creators.$inferSelect;
@@ -63,3 +81,6 @@ export type Song = typeof songs.$inferSelect;
 
 export type InsertVideoSubmission = z.infer<typeof insertVideoSubmissionSchema>;
 export type VideoSubmission = typeof video_submissions.$inferSelect;
+
+export type InsertReferral = z.infer<typeof insertReferralSchema>;
+export type Referral = typeof referrals.$inferSelect;

@@ -57,8 +57,22 @@ const CreatorDashboard = () => {
         });
       }
 
-      // Set referral count (in real app, this would be fetched from database)
-      setReferralCount(Math.floor(Math.random() * 10) + 2);
+      // Try to fetch real referral count
+      if (storedCreator) {
+        try {
+          const response = await fetch(`/api/referrals/count/${storedCreator.id || 'demo'}`);
+          if (response.ok) {
+            const data = await response.json();
+            setReferralCount(data.count);
+          } else {
+            // Fallback for demo
+            setReferralCount(Math.floor(Math.random() * 10) + 2);
+          }
+        } catch (error) {
+          console.error('Error fetching referral count:', error);
+          setReferralCount(Math.floor(Math.random() * 10) + 2);
+        }
+      }
 
       // Try to fetch songs, use sample data if database not ready
       try {

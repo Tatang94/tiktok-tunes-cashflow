@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getSupabaseClient } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
-import { User, Mail, Phone, Wallet } from "lucide-react";
+import { User, Mail, Phone, Wallet, Users } from "lucide-react";
 import { useLocation } from "wouter";
 
 const RegistrationSection = () => {
@@ -23,8 +23,21 @@ const RegistrationSection = () => {
     email: ""
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [referralCode, setReferralCode] = useState("");
+  const [referrerInfo, setReferrerInfo] = useState<any>(null);
+  const [validatingReferral, setValidatingReferral] = useState(false);
   const { toast } = useToast();
   const [, setLocation] = useLocation();
+
+  useEffect(() => {
+    // Check for referral code in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const refCode = urlParams.get('ref');
+    if (refCode) {
+      setReferralCode(refCode);
+      validateReferralCode(refCode);
+    }
+  }, []);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -32,6 +45,38 @@ const RegistrationSection = () => {
 
   const handleLoginInputChange = (field: string, value: string) => {
     setLoginData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const validateReferralCode = async (code: string) => {
+    if (!code) {
+      setReferrerInfo(null);
+      return;
+    }
+
+    setValidatingReferral(true);
+    try {
+      const response = await fetch(`/api/referrals/validate/${code}`);
+      if (response.ok) {
+        const data = await response.json();
+        setReferrerInfo(data.referrer);
+        toast({
+          title: "Referral Valid!",
+          description: `Direferensikan oleh ${data.referrer.tiktok_username}. Kamu akan mendapat bonus registrasi!`
+        });
+      } else {
+        setReferrerInfo(null);
+        toast({
+          title: "Kode Referral Invalid",
+          description: "Kode referral tidak ditemukan atau sudah expired",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      console.error('Error validating referral:', error);
+      setReferrerInfo(null);
+    } finally {
+      setValidatingReferral(false);
+    }
   };
 
   const validateForm = () => {
@@ -98,14 +143,18 @@ const RegistrationSection = () => {
 
     setIsLoading(true);
     try {
+      // Prepare data with referral info if available
+      const submissionData = {
+        ...formData,
+        total_earnings: 0,
+        video_count: 0,
+        ...(referrerInfo && { referred_by: referrerInfo.id })
+      };
+
       const supabase = await getSupabaseClient();
       const { error } = await supabase
         .from('creators')
-        .insert([{
-          ...formData,
-          total_earnings: 0,
-          video_count: 0
-        }]);
+        .insert([submissionData]);
 
       if (error) {
         console.error('Registration error:', error);
@@ -125,7 +174,9 @@ const RegistrationSection = () => {
 
       toast({
         title: "Pendaftaran Berhasil! 🎉",
-        description: "Akun creator kamu sudah aktif. Yuk mulai upload video!"
+        description: referrerInfo 
+          ? `Akun creator berhasil didaftarkan dengan referral dari ${referrerInfo.tiktok_username}!` 
+          : "Akun creator kamu sudah aktif. Yuk mulai upload video!"
       });
 
       // Store creator info for session
@@ -133,7 +184,8 @@ const RegistrationSection = () => {
         ...formData,
         total_earnings: 0,
         video_count: 0,
-        id: Date.now().toString() // temporary ID
+        id: Date.now().toString(),
+        referral_code: `${formData.tiktok_username?.replace('@', '').toUpperCase()}-REF-NEW`
       }));
 
       // Reset form
@@ -386,6 +438,43 @@ const RegistrationSection = () => {
                     placeholder="081234567890 (minimal 10 digit angka)" 
                     className="border-2 focus:border-tiktok-pink"
                   />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="referral-code" className="flex items-center gap-2">
+                    <Users className="w-4 h-4" />
+                    Kode Referral (Opsional)
+                  </Label>
+                  <div className="flex gap-2">
+                    <Input 
+                      id="referral-code"
+                      value={referralCode}
+                      onChange={(e) => {
+                        setReferralCode(e.target.value);
+                        if (e.target.value) {
+                          validateReferralCode(e.target.value);
+                        } else {
+                          setReferrerInfo(null);
+                        }
+                      }}
+                      placeholder="CREATOR-REF-123 (dapat bonus Rp 50.000)" 
+                      className="border-2 focus:border-tiktok-pink flex-1"
+                    />
+                    {validatingReferral && (
+                      <div className="flex items-center text-sm text-muted-foreground">
+                        Loading...
+                      </div>
+                    )}
+                  </div>
+                  {referrerInfo && (
+                    <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded-lg border border-green-200 dark:border-green-800">
+                      <p className="text-sm text-green-700 dark:text-green-300">
+                        ✅ Referral valid! Direferensikan oleh <strong>{referrerInfo.tiktok_username}</strong>
+                        <br />
+                        🎁 Kamu akan mendapat bonus registrasi!
+                      </p>
+                    </div>
+                  )}
                 </div>
                 
                 <div className="bg-muted/30 p-4 rounded-lg">
