@@ -52,9 +52,45 @@ git push origin main
 4. Deploy akan berjalan dengan konfigurasi yang benar
 
 ### 3. Set Environment Variables di Vercel
-- `SUPABASE_URL`: URL Supabase project
-- `SUPABASE_ANON_KEY`: Anon key dari Supabase
-- `DATABASE_URL`: Connection string database (jika diperlukan)
+
+**PENTING**: Ini adalah langkah wajib agar aplikasi bisa connect ke database!
+
+#### Cara Setting Environment Variables:
+1. **Buka Vercel Dashboard** → Pilih project Anda
+2. **Klik tab "Settings"** 
+3. **Klik "Environment Variables"** di sidebar kiri
+4. **Tambahkan variables berikut:**
+
+| Name | Value | Production/Preview/Development |
+|------|-------|--------------------------------|
+| `SUPABASE_URL` | `https://xxxxx.supabase.co` | ✓ All environments |
+| `SUPABASE_ANON_KEY` | `eyJhbGciOiJIUzI1NiIsIn...` | ✓ All environments |
+
+#### Cara Mendapatkan Values:
+1. **Buka Supabase Dashboard** → https://supabase.com/dashboard
+2. **Pilih project Anda**
+3. **Klik "Settings"** → **"API"**
+4. **Copy values:**
+   - **URL**: Project URL 
+   - **anon/public**: anon key (bukan service_role!)
+
+#### Screenshot Panduan:
+```
+Vercel Dashboard → Project → Settings → Environment Variables
+[Add New] 
+Name: SUPABASE_URL
+Value: https://your-project-id.supabase.co
+Environments: ✓ Production ✓ Preview ✓ Development
+[Save]
+
+[Add New]
+Name: SUPABASE_ANON_KEY  
+Value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+Environments: ✓ Production ✓ Preview ✓ Development
+[Save]
+```
+
+⚠️ **Setelah menambah environment variables, Anda HARUS redeploy!**
 
 ## Yang Akan Bekerja Setelah Deploy:
 - ✅ Frontend React akan ter-render dengan benar
