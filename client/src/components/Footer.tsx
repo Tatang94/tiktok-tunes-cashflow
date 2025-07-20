@@ -9,7 +9,6 @@ const Footer = () => {
       links: [
         { name: "Platforms", href: "/platforms" },
         { name: "Creator Dashboard", href: "/creator-dashboard" },
-        { name: "Admin Panel", href: "/admin" },
         { name: "FAQ", href: "/support" }
       ]
     },
