@@ -50,6 +50,8 @@ Platform untuk creator TikTok yang memungkinkan mereka mendaftar, memilih lagu, 
 - ✅ Root cause analysis 404 error Vercel: build structure mismatch dan API format diperbaiki
 - ✅ Build script updated untuk kompatibilitas Vercel (move dist/public ke dist/)
 - ✅ Versi khusus Vercel dibuat: vercel-build.js dan folder vercel-dist/ siap deploy
+- ✅ Problem "blank putih" Vercel diperbaiki dengan vercel-build-fixed.js
+- ✅ Struktur deployment Vercel disederhanakan: static files di root, API minimal
 
 ## Project Architecture
 ### Backend (Node.js + Express)
