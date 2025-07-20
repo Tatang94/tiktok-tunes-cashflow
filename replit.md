@@ -56,6 +56,7 @@ Platform untuk creator TikTok yang memungkinkan mereka mendaftar, memilih lagu, 
 - ✅ Error Vercel "functions vs builds" diperbaiki di semua konfigurasi
 - ✅ Runtime version error diperbaiki dengan konfigurasi minimal Vercel
 - ✅ SPA routing diperbaiki untuk halaman admin dan routes lainnya di Vercel
+- ✅ Demo data dibersihkan: creator baru mulai dari Rp 0 tanpa earnings palsu
 
 ## Project Architecture
 ### Backend (Node.js + Express)

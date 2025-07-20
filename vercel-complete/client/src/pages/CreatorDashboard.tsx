@@ -44,17 +44,8 @@ const CreatorDashboard = () => {
         const creatorData = JSON.parse(storedCreator);
         setCreator(creatorData);
       } else {
-        // Fallback to demo creator data when no stored data
-        setCreator({
-          id: mockCreatorId,
-          tiktok_username: 'demo_creator',
-          email: 'demo@example.com',
-          phone: '08123456789',
-          ewallet_type: 'DANA',
-          ewallet_number: '08123456789',
-          total_earnings: 0,
-          video_count: 0
-        });
+        // Redirect to homepage if no creator data
+        window.location.href = '/';
       }
 
       // Try to fetch real referral count
@@ -65,12 +56,12 @@ const CreatorDashboard = () => {
             const data = await response.json();
             setReferralCount(data.count);
           } else {
-            // Fallback for demo
-            setReferralCount(Math.floor(Math.random() * 10) + 2);
+            // No fallback demo data - start from 0
+            setReferralCount(0);
           }
         } catch (error) {
           console.error('Error fetching referral count:', error);
-          setReferralCount(Math.floor(Math.random() * 10) + 2);
+          setReferralCount(0);
         }
       }
 
