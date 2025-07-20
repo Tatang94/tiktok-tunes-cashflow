@@ -5,6 +5,8 @@
 ✅ **Solusi**: Konfigurasi ulang untuk deployment fullstack yang tepat
 ✅ **Masalah**: 404 NOT_FOUND error di Vercel
 ✅ **Solusi**: API refactored untuk Vercel serverless functions dengan @vercel/node
+✅ **Masalah**: Build structure mismatch (dist/public vs dist/)
+✅ **Solusi**: Updated build.js untuk move files dari dist/public ke dist/ untuk kompatibilitas Vercel
 
 ## File yang Ditambahkan untuk Vercel:
 

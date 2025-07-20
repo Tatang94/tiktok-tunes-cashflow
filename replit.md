@@ -47,6 +47,8 @@ Platform untuk creator TikTok yang memungkinkan mereka mendaftar, memilih lagu, 
 - ✅ Migrasi berhasil dari Replit Agent ke environment Replit (Juli 2025)
 - ✅ Navigation footer dibersihkan: menghapus link "Admin Panel" dan "Creator Dashboard"
 - ✅ Vercel deployment diperbaiki: API diubah ke serverless functions dengan @vercel/node
+- ✅ Root cause analysis 404 error Vercel: build structure mismatch dan API format diperbaiki
+- ✅ Build script updated untuk kompatibilitas Vercel (move dist/public ke dist/)
 
 ## Project Architecture
 ### Backend (Node.js + Express)
