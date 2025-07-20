@@ -198,6 +198,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // YouTube Music API routes
+  app.get("/api/ytmusic/search", async (req, res) => {
+    try {
+      const query = req.query.q as string;
+      const limit = parseInt(req.query.limit as string) || 20;
+
+      if (!query) {
+        return res.status(400).json({ error: 'Query parameter q is required' });
+      }
+
+      // Use ytmusic-service here - for now return simulated data
+      const tracks = [
+        {
+          id: "IR7tYHdYN2Q",
+          videoId: "IR7tYHdYN2Q",
+          title: "To the Bone",
+          artist: "Pamungkas",
+          duration: "4:02",
+          streamUrl: `https://music.youtube.com/watch?v=IR7tYHdYN2Q`,
+          thumbnail: `https://img.youtube.com/vi/IR7tYHdYN2Q/maxresdefault.jpg`,
+          playCount: 5420193,
+          useCount: 12847
+        }
+      ];
+
+      res.json({ tracks, total: tracks.length });
+    } catch (error) {
+      console.error('YouTube Music search error:', error);
+      res.status(500).json({ 
+        error: 'YouTube Music API error', 
+        details: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

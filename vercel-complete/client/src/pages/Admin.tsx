@@ -146,13 +146,13 @@ const Admin = () => {
       
       toast({
         title: "Pencarian berhasil",
-        description: `Ditemukan ${data.tracks?.length || 0} lagu.`
+        description: `Ditemukan ${data.tracks?.length || 0} lagu dari YouTube Music.`
       });
     } catch (error) {
       console.error('YouTube Music search error:', error);
       toast({
         title: "Error",
-        description: "Gagal mencari lagu di YouTube Music.",
+        description: "Gagal mencari lagu di YouTube Music. Pastikan koneksi internet stabil.",
         variant: "destructive"
       });
       setYtSearchResults([]);

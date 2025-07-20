@@ -1,4 +1,4 @@
-import { YTMusic } from 'ytmusic-api';
+import YTMusic from 'ytmusic-api';
 
 export interface YTMusicTrack {
   videoId: string;

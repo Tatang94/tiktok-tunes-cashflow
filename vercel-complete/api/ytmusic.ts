@@ -1,5 +1,5 @@
 import { type VercelRequest, type VercelResponse } from '@vercel/node';
-import { YTMusic } from 'ytmusic-api';
+import YTMusic from 'ytmusic-api';
 
 // CORS setup
 const corsHeaders = {
