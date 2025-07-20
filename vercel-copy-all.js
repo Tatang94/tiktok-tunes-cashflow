@@ -94,23 +94,17 @@ buildFiles.forEach(file => {
 console.log('⚙️ Creating Vercel configuration...');
 const vercelConfig = {
   "version": 2,
-  "builds": [
-    {
-      "src": "api/index.ts",
-      "use": "@vercel/node"
+  "functions": {
+    "api/index.ts": {
+      "runtime": "@vercel/node@20"
     }
-  ],
+  },
   "rewrites": [
     {
       "source": "/api/(.*)",
       "destination": "/api/index.ts"
     }
-  ],
-  "functions": {
-    "api/index.ts": {
-      "runtime": "@vercel/node@20"
-    }
-  }
+  ]
 };
 
 fs.writeFileSync('./vercel-complete/vercel.json', JSON.stringify(vercelConfig, null, 2));
