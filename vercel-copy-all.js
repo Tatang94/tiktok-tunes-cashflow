@@ -94,15 +94,14 @@ buildFiles.forEach(file => {
 console.log('⚙️ Creating Vercel configuration...');
 const vercelConfig = {
   "version": 2,
-  "functions": {
-    "api/index.ts": {
-      "runtime": "nodejs20.x"
-    }
-  },
   "rewrites": [
     {
       "source": "/api/(.*)",
       "destination": "/api/index.ts"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 };
