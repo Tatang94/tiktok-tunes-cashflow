@@ -1,0 +1,10 @@
+{
+  "name": "tiktok-creator-platform-vercel",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.52.0",
+    "@vercel/node": "latest",
+    "zod": "^3.24.2"
+  }
+}
