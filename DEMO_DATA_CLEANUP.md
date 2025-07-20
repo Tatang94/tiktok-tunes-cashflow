@@ -35,7 +35,31 @@ setCreator({
 window.location.href = '/';
 ```
 
-### 3. Browser Storage Cleanup
+### 3. Hapus Sample Songs Data
+```typescript
+// BEFORE: server/storage.ts
+const sampleSongs = [
+  { title: "Trending Beat #1", earnings_per_video: "150" },
+  { title: "Viral Sound #2", earnings_per_video: "200" },
+  // ...
+];
+
+// AFTER: Bersih tanpa sample data
+private initializeSampleData() {
+  // No sample data - start clean
+}
+```
+
+### 4. Clean SongListSection
+```typescript
+// BEFORE: Fallback ke sample songs
+setSongs(sampleSongs);
+
+// AFTER: Array kosong jika tidak ada data
+setSongs([]);
+```
+
+### 5. Browser Storage Cleanup
 - Clear localStorage untuk menghapus data lama
 - Fresh start untuk semua creator baru
 

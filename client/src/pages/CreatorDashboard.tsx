@@ -77,25 +77,8 @@ const CreatorDashboard = () => {
         setSongs(songsData || []);
       } catch (songsError: any) {
         console.error('Songs error:', songsError);
-        // Use sample songs data when database not ready
-        setSongs([
-          {
-            id: 1,
-            title: "Trending Beat #1",
-            artist: "DJ TikTok",
-            status: "Active",
-            earnings_per_video: 150,
-            duration: "0:30"
-          },
-          {
-            id: 2,
-            title: "Viral Sound #2",
-            artist: "Viral Artist",
-            status: "Active",
-            earnings_per_video: 200,
-            duration: "0:45"
-          }
-        ]);
+        // No fallback sample songs - start clean
+        setSongs([]);
       }
 
       // Try to fetch submissions, use empty array if database not ready

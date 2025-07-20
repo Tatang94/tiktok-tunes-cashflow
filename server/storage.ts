@@ -68,22 +68,8 @@ export class MemStorage implements IStorage {
   }
 
   private initializeSampleData() {
-    // Add sample songs
-    const sampleSongs = [
-      { title: "Trending Beat #1", artist: "Artist A", status: "available", earnings_per_video: "150", duration: "3:30", file_url: null, spotify_url: null, is_active: true },
-      { title: "Viral Sound #2", artist: "Artist B", status: "available", earnings_per_video: "200", duration: "2:45", file_url: null, spotify_url: null, is_active: true },
-      { title: "Popular Track #3", artist: "Artist C", status: "available", earnings_per_video: "100", duration: "4:15", file_url: null, spotify_url: null, is_active: true },
-    ];
-
-    sampleSongs.forEach(song => {
-      const id = this.currentSongId++;
-      const songWithId: Song = { 
-        ...song, 
-        id, 
-        created_at: new Date() 
-      };
-      this.songs.set(id, songWithId);
-    });
+    // No sample data - start clean
+    // Songs will be added by admin through the admin panel
   }
 
   // Creator methods
