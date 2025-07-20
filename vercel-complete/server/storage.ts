@@ -88,7 +88,8 @@ export class MemStorage implements IStorage {
 
   async createCreator(insertCreator: InsertCreator): Promise<Creator> {
     const id = this.currentCreatorId++;
-    const referralCode = `${insertCreator.tiktok_username?.replace('@', '').toUpperCase()}-REF-${id}`;
+    const username = (insertCreator.tiktok_username as string) || '';
+    const referralCode = `${username.replace('@', '').toUpperCase()}-REF-${id}`;
     
     const creator: Creator = { 
       ...insertCreator, 
@@ -97,17 +98,18 @@ export class MemStorage implements IStorage {
       video_count: 0,
       referral_code: referralCode,
       referral_earnings: "0",
-      referred_by: insertCreator.referred_by || null,
+      referred_by: (insertCreator.referred_by as number) || null,
       created_at: new Date() 
     };
     this.creators.set(id, creator);
     
     // If there's a referrer, create a referral record
     if (insertCreator.referred_by) {
-      const referrer = await this.getCreator(insertCreator.referred_by);
+      const referrerId = insertCreator.referred_by as number;
+      const referrer = await this.getCreator(referrerId);
       if (referrer) {
         await this.createReferral({
-          referrer_id: insertCreator.referred_by,
+          referrer_id: referrerId,
           referred_id: id,
           referral_code: referrer.referral_code || '',
           bonus_amount: "500",
@@ -150,6 +152,10 @@ export class MemStorage implements IStorage {
     const song: Song = { 
       ...insertSong, 
       id, 
+      earnings_per_video: insertSong.earnings_per_video || "100",
+      file_url: insertSong.file_url || null,
+      spotify_url: insertSong.spotify_url || null,
+      is_active: insertSong.is_active ?? true,
       created_at: new Date() 
     };
     this.songs.set(id, song);
@@ -185,6 +191,9 @@ export class MemStorage implements IStorage {
     const submission: VideoSubmission = { 
       ...insertSubmission, 
       id, 
+      creator_id: insertSubmission.creator_id || null,
+      song_id: insertSubmission.song_id || null,
+      admin_notes: insertSubmission.admin_notes || null,
       status: "pending",
       earnings: "0",
       created_at: new Date() 
@@ -224,6 +233,8 @@ export class MemStorage implements IStorage {
     const referral: Referral = {
       ...insertReferral,
       id,
+      status: insertReferral.status || "pending",
+      bonus_amount: insertReferral.bonus_amount || "500",
       created_at: new Date()
     };
     this.referrals.set(id, referral);
