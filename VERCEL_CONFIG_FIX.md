@@ -11,7 +11,7 @@ Error: "The `functions` property cannot be used in conjunction with the `builds`
   "version": 2,
   "functions": {
     "api/index.ts": {
-      "runtime": "@vercel/node@20"
+      "runtime": "nodejs20.x"
     }
   },
   "rewrites": [
