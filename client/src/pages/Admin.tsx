@@ -36,18 +36,43 @@ const Admin = () => {
     earnings_per_video: 100
   });
   
-  const [availableTangtainmentSongs, setAvailableTangtainmentSongs] = useState([
-    { id: 1, title: "Beat Drop Symphony", duration: "0:30", popularity: "🔥 Trending" },
-    { id: 2, title: "Viral Dance Mix", duration: "0:45", popularity: "✨ Popular" },
-    { id: 3, title: "Electronic Pulse", duration: "0:35", popularity: "🚀 New Hit" },
-    { id: 4, title: "Hip Hop Fusion", duration: "0:40", popularity: "🔥 Trending" },
-    { id: 5, title: "Melodic Waves", duration: "0:32", popularity: "✨ Popular" },
-    { id: 6, title: "Bass Thunder", duration: "0:38", popularity: "🚀 New Hit" },
-    { id: 7, title: "Rhythm Storm", duration: "0:42", popularity: "🔥 Trending" },
-    { id: 8, title: "Digital Dreams", duration: "0:35", popularity: "✨ Popular" }
-  ]);
+  const [availableTangtainmentSongs, setAvailableTangtainmentSongs] = useState([]);
+  const [isLoadingTikTokAPI, setIsLoadingTikTokAPI] = useState(false);
   
   const [selectedTangtainmentSong, setSelectedTangtainmentSong] = useState(null);
+
+  // Fetch TikTok API Music dari Tangtainment
+  const fetchTangtainmentMusic = async () => {
+    setIsLoadingTikTokAPI(true);
+    try {
+      // Simulasi API call ke TikTok Music API untuk kategori Tangtainment
+      // Ini akan diganti dengan API call yang sebenarnya
+      const response = await fetch('/api/tiktok-music/tangtainment', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch TikTok music');
+      }
+      
+      const musicData = await response.json();
+      setAvailableTangtainmentSongs(musicData);
+    } catch (error) {
+      console.error('Error fetching Tangtainment music:', error);
+      // Fallback data jika API tidak tersedia
+      toast({
+        title: "Error TikTok API",
+        description: "Tidak dapat mengakses TikTok Music API. Periksa koneksi atau credentials.",
+        variant: "destructive"
+      });
+      setAvailableTangtainmentSongs([]);
+    } finally {
+      setIsLoadingTikTokAPI(false);
+    }
+  };
 
   useEffect(() => {
     // Check if already logged in
@@ -55,6 +80,7 @@ const Admin = () => {
     if (adminAuth === 'true') {
       setIsAuthenticated(true);
       fetchData();
+      fetchTangtainmentMusic();
     }
   }, []);
 
@@ -64,9 +90,10 @@ const Admin = () => {
       setIsAuthenticated(true);
       localStorage.setItem('adminAuth', 'true');
       fetchData();
+      fetchTangtainmentMusic();
       toast({
         title: "Login berhasil!",
-        description: "Selamat datang di admin panel."
+        description: "Mengambil data TikTok Music..."
       });
     } else {
       toast({
@@ -605,31 +632,56 @@ const Admin = () => {
                   </div>
 
                   <div className="space-y-3 max-h-96 overflow-y-auto">
-                    {availableTangtainmentSongs.map((song) => (
-                      <div
-                        key={song.id}
-                        className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-md ${
-                          selectedTangtainmentSong?.id === song.id 
-                            ? 'border-tiktok-blue bg-tiktok-blue/5 shadow-sm' 
-                            : 'border-gray-200 hover:border-tiktok-blue/50'
-                        }`}
-                        onClick={() => selectTangtainmentSong(song)}
-                      >
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <h4 className="font-semibold text-base">{song.title}</h4>
-                            <p className="text-sm text-muted-foreground">by Tangtainment</p>
-                            <div className="flex gap-2 mt-2">
-                              <Badge variant="outline">{song.duration}</Badge>
-                              <Badge variant="secondary">{song.popularity}</Badge>
-                            </div>
-                          </div>
-                          {selectedTangtainmentSong?.id === song.id && (
-                            <Check className="w-5 h-5 text-tiktok-blue" />
-                          )}
-                        </div>
+                    {isLoadingTikTokAPI ? (
+                      <div className="p-8 text-center">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-tiktok-blue mx-auto mb-4"></div>
+                        <p className="text-sm text-muted-foreground">Loading TikTok Music API...</p>
                       </div>
-                    ))}
+                    ) : availableTangtainmentSongs.length === 0 ? (
+                      <div className="p-6 text-center text-muted-foreground">
+                        <Music className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                        <p>Tidak ada lagu Tangtainment tersedia</p>
+                        <Button 
+                          onClick={fetchTangtainmentMusic} 
+                          variant="outline" 
+                          size="sm" 
+                          className="mt-2"
+                        >
+                          Reload TikTok API
+                        </Button>
+                      </div>
+                    ) : (
+                      availableTangtainmentSongs.map((song) => (
+                        <div
+                          key={song.id}
+                          className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 hover:shadow-md ${
+                            selectedTangtainmentSong?.id === song.id 
+                              ? 'border-tiktok-blue bg-tiktok-blue/5 shadow-sm' 
+                              : 'border-gray-200 hover:border-tiktok-blue/50'
+                          }`}
+                          onClick={() => selectTangtainmentSong(song)}
+                        >
+                          <div className="flex justify-between items-start">
+                            <div className="flex-1">
+                              <h4 className="font-semibold text-base">{song.title}</h4>
+                              <p className="text-sm text-muted-foreground">by Tangtainment</p>
+                              <div className="flex gap-2 mt-2 mb-2">
+                                <Badge variant="outline">{song.duration}</Badge>
+                                <Badge variant="secondary">{song.popularity}</Badge>
+                              </div>
+                              <div className="text-xs text-muted-foreground space-y-1">
+                                <div>🎵 {song.play_count?.toLocaleString()} plays</div>
+                                <div>📱 {song.use_count?.toLocaleString()} video uses</div>
+                                <div>🎤 TikTok ID: {song.tiktok_music_id}</div>
+                              </div>
+                            </div>
+                            {selectedTangtainmentSong?.id === song.id && (
+                              <Check className="w-5 h-5 text-tiktok-blue" />
+                            )}
+                          </div>
+                        </div>
+                      ))
+                    )}
                   </div>
 
                   {selectedTangtainmentSong && (

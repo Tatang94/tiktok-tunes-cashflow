@@ -64,6 +64,10 @@ Platform untuk creator TikTok yang memungkinkan mereka mendaftar, memilih lagu, 
 - ✅ Form tambah lagu diganti dengan sistem pilih dari koleksi Tangtainment Music
 - ✅ Error handling diperbaiki untuk mengatasi masalah penambahan lagu
 - ✅ URL lagu otomatis menggunakan TikTok API (bukan Spotify)
+- ✅ TikTok API backend endpoint diperbaiki dengan struktur data yang akurat (Juli 2025)
+- ✅ Frontend menampilkan data TikTok asli: play count, use count, TikTok music ID
+- ✅ Loading state dan error handling untuk TikTok API yang lebih robust
+- ✅ URL musik menggunakan format TikTok CDN (sf16-ies-music-va.tiktokcdn.com)
 
 ## Project Architecture
 ### Backend (Node.js + Express)

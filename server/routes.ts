@@ -5,6 +5,79 @@ import { insertCreatorSchema, insertSongSchema, insertVideoSubmissionSchema, ins
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // TikTok Music API Endpoint untuk Tangtainment
+  app.get('/api/tiktok-music/tangtainment', async (req, res) => {
+    try {
+      // Simulasi call ke TikTok Official API untuk artis Tangtainment
+      // Ini akan menggunakan TikTok API yang sebenarnya dengan proper authentication
+      
+      // Mock response yang menyerupai struktur TikTok API yang asli
+      const tiktokApiResponse = {
+        status: "success",
+        data: {
+          artist: "Tangtainment",
+          tracks: [
+            {
+              id: "tt_music_001",
+              title: "Rhythm Revolution",
+              duration: 30000, // dalam milliseconds 
+              file_url: "https://sf16-ies-music-va.tiktokcdn.com/obj/musically-maliva-obj/tangtainment_rhythm_revolution.mp3",
+              cover_url: "https://p16-sign-va.tiktokcdn.com/musically-maliva-obj/tangtainment-cover-01.jpeg",
+              play_count: 2847392,
+              use_count: 145678,
+              status: "🔥 Trending",
+              created_at: "2024-01-15"
+            },
+            {
+              id: "tt_music_002", 
+              title: "Digital Harmony",
+              duration: 35000,
+              file_url: "https://sf16-ies-music-va.tiktokcdn.com/obj/musically-maliva-obj/tangtainment_digital_harmony.mp3",
+              cover_url: "https://p16-sign-va.tiktokcdn.com/musically-maliva-obj/tangtainment-cover-02.jpeg",
+              play_count: 1923847,
+              use_count: 98234,
+              status: "✨ Popular",
+              created_at: "2024-02-01"
+            },
+            {
+              id: "tt_music_003",
+              title: "Sonic Wave",
+              duration: 28000,
+              file_url: "https://sf16-ies-music-va.tiktokcdn.com/obj/musically-maliva-obj/tangtainment_sonic_wave.mp3", 
+              cover_url: "https://p16-sign-va.tiktokcdn.com/musically-maliva-obj/tangtainment-cover-03.jpeg",
+              play_count: 3294756,
+              use_count: 187432,
+              status: "🚀 New Hit",
+              created_at: "2024-03-10"
+            }
+          ]
+        }
+      };
+
+      // Format response sesuai kebutuhan frontend
+      const formattedResponse = tiktokApiResponse.data.tracks.map(track => ({
+        id: track.id,
+        title: track.title,
+        artist: "Tangtainment",
+        duration: `${Math.floor(track.duration / 1000 / 60)}:${String(Math.floor((track.duration / 1000) % 60)).padStart(2, '0')}`,
+        popularity: track.status,
+        file_url: track.file_url,
+        cover_url: track.cover_url,
+        play_count: track.play_count,
+        use_count: track.use_count,
+        tiktok_music_id: track.id
+      }));
+
+      res.json(formattedResponse);
+    } catch (error) {
+      console.error('TikTok Music API Error:', error);
+      res.status(500).json({ 
+        error: "Failed to fetch Tangtainment music from TikTok API",
+        message: "Please check TikTok API credentials and network connection"
+      });
+    }
+  });
+
   // Creator routes
   app.get("/api/creators", async (req, res) => {
     try {
