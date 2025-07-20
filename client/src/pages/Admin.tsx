@@ -320,21 +320,44 @@ const Admin = () => {
 
         {/* Main Content Tabs */}
         <Tabs defaultValue="analytics" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="analytics">Analytics</TabsTrigger>
-            <TabsTrigger value="submissions">Video Submissions</TabsTrigger>
-            <TabsTrigger value="songs">Kelola Lagu</TabsTrigger>
-            <TabsTrigger value="creators">Creators</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 gap-2 h-auto p-2 bg-muted/20">
+            <TabsTrigger 
+              value="analytics" 
+              className="data-[state=active]:bg-tiktok-blue data-[state=active]:text-white font-medium px-4 py-3 rounded-lg"
+            >
+              📊 Analytics
+            </TabsTrigger>
+            <TabsTrigger 
+              value="submissions" 
+              className="data-[state=active]:bg-tiktok-pink data-[state=active]:text-white font-medium px-4 py-3 rounded-lg"
+            >
+              🎬 Video Submissions
+            </TabsTrigger>
+            <TabsTrigger 
+              value="songs" 
+              className="data-[state=active]:bg-tiktok-purple data-[state=active]:text-white font-medium px-4 py-3 rounded-lg"
+            >
+              🎵 Kelola Lagu
+            </TabsTrigger>
+            <TabsTrigger 
+              value="creators" 
+              className="data-[state=active]:bg-green-500 data-[state=active]:text-white font-medium px-4 py-3 rounded-lg"
+            >
+              👥 Creators
+            </TabsTrigger>
           </TabsList>
 
           {/* Analytics Tab */}
-          <TabsContent value="analytics">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Platform Performance</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
+          <TabsContent value="analytics" className="mt-6">
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <Card className="border-l-4 border-l-tiktok-blue">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      📊 Platform Performance
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
                   <div className="flex justify-between items-center p-4 bg-muted/30 rounded-lg">
                     <div>
                       <p className="font-medium">Total Video Submissions</p>
@@ -363,9 +386,11 @@ const Admin = () => {
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="border-l-4 border-l-green-500">
                 <CardHeader>
-                  <CardTitle>Revenue Analytics</CardTitle>
+                  <CardTitle className="flex items-center gap-2">
+                    💰 Revenue Analytics
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex justify-between items-center p-4 bg-muted/30 rounded-lg">
@@ -401,10 +426,15 @@ const Admin = () => {
           </TabsContent>
 
           {/* Video Submissions Tab */}
-          <TabsContent value="submissions">
-            <Card>
+          <TabsContent value="submissions" className="mt-6">
+            <Card className="border-l-4 border-l-tiktok-pink">
               <CardHeader>
-                <CardTitle>Video Submissions - Review</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  🎬 Video Submissions - Review
+                </CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Kelola dan review video submissions dari creator
+                </p>
               </CardHeader>
               <CardContent>
                 <Table>
@@ -479,16 +509,20 @@ const Admin = () => {
           </TabsContent>
 
           {/* Songs Management Tab */}
-          <TabsContent value="songs">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Add New Song Form */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Plus className="w-5 h-5" />
-                    Tambah Lagu Baru
-                  </CardTitle>
-                </CardHeader>
+          <TabsContent value="songs" className="mt-6">
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Add New Song Form */}
+                <Card className="border-l-4 border-l-tiktok-purple">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Plus className="w-5 h-5" />
+                      🎵 Tambah Lagu Baru
+                    </CardTitle>
+                    <p className="text-sm text-muted-foreground">
+                      Tambahkan lagu baru untuk creator
+                    </p>
+                  </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="title">Judul Lagu</Label>
@@ -571,9 +605,14 @@ const Admin = () => {
               </Card>
 
               {/* Songs List */}
-              <Card>
+              <Card className="border-l-4 border-l-orange-500">
                 <CardHeader>
-                  <CardTitle>Daftar Lagu Aktif</CardTitle>
+                  <CardTitle className="flex items-center gap-2">
+                    🎶 Daftar Lagu Aktif
+                  </CardTitle>
+                  <p className="text-sm text-muted-foreground">
+                    Kelola lagu yang tersedia untuk creator
+                  </p>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
@@ -599,10 +638,15 @@ const Admin = () => {
           </TabsContent>
 
           {/* Creators Tab */}
-          <TabsContent value="creators">
-            <Card>
+          <TabsContent value="creators" className="mt-6">
+            <Card className="border-l-4 border-l-green-500">
               <CardHeader>
-                <CardTitle>Daftar Creators</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  👥 Daftar Creators
+                </CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Kelola dan monitor creator yang terdaftar
+                </p>
               </CardHeader>
               <CardContent>
                 <Table>
