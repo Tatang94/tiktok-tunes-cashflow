@@ -272,6 +272,13 @@ const packageJson = {
 
 fs.writeFileSync('./vercel-dist/package.json', JSON.stringify(packageJson, null, 2));
 
+// Fix asset paths in HTML for Vercel structure
+console.log('🔧 Fixing asset paths...');
+let htmlContent = fs.readFileSync('./vercel-dist/public/index.html', 'utf8');
+htmlContent = htmlContent.replace(/src="\/assets\//g, 'src="/public/assets/');
+htmlContent = htmlContent.replace(/href="\/assets\//g, 'href="/public/assets/');
+fs.writeFileSync('./vercel-dist/public/index.html', htmlContent);
+
 console.log('✅ Vercel build complete!');
 console.log('📁 Deploy folder: ./vercel-dist');
 console.log('🚀 Ready for Vercel deployment!');
