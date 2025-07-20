@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getSupabaseClient } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
+import { clearAllDemoData } from "@/utils/clearDemoData";
 import { DollarSign, Video, Music, Upload, ExternalLink, Users, Copy, Share2, User } from "lucide-react";
 
 const CreatorDashboard = () => {
@@ -28,6 +29,8 @@ const CreatorDashboard = () => {
   const mockCreatorId = "demo-creator-123";
 
   useEffect(() => {
+    // Clear any demo data first
+    clearAllDemoData();
     fetchData();
   }, []);
 
@@ -48,22 +51,12 @@ const CreatorDashboard = () => {
         window.location.href = '/';
       }
 
-      // Try to fetch real referral count
-      if (storedCreator) {
-        try {
-          const response = await fetch(`/api/referrals/count/${storedCreator.id || 'demo'}`);
-          if (response.ok) {
-            const data = await response.json();
-            setReferralCount(data.count);
-          } else {
-            // No fallback demo data - start from 0
-            setReferralCount(0);
-          }
-        } catch (error) {
-          console.error('Error fetching referral count:', error);
-          setReferralCount(0);
-        }
-      }
+      // Force referral count to start from 0 - no demo data
+      setReferralCount(0);
+      
+      // Clear any old localStorage demo data
+      localStorage.removeItem('demoReferralCount');
+      localStorage.removeItem('referralData');
 
       // Try to fetch songs, use sample data if database not ready
       try {
