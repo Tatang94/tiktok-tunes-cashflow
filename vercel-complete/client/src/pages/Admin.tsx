@@ -730,39 +730,64 @@ const Admin = () => {
                 <CardTitle>Daftar Creators</CardTitle>
               </CardHeader>
               <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>TikTok Username</TableHead>
-                      <TableHead>Email</TableHead>
-                      <TableHead>Phone</TableHead>
-                      <TableHead>eWallet</TableHead>
-                      <TableHead>Video Count</TableHead>
-                      <TableHead>Total Earnings</TableHead>
-                      <TableHead>Join Date</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {creators.map((creator) => (
-                      <TableRow key={creator.id}>
-                        <TableCell>@{creator.tiktok_username}</TableCell>
-                        <TableCell>{creator.email}</TableCell>
-                        <TableCell>{creator.phone}</TableCell>
-                        <TableCell>
-                          <div>
-                            <div className="font-medium">{creator.ewallet_type}</div>
-                            <div className="text-sm text-muted-foreground">{creator.ewallet_number}</div>
-                          </div>
-                        </TableCell>
-                        <TableCell>{creator.video_count || 0}</TableCell>
-                        <TableCell>Rp {(creator.total_earnings || 0).toLocaleString('id-ID')}</TableCell>
-                        <TableCell>
-                          {new Date(creator.created_at).toLocaleDateString('id-ID')}
-                        </TableCell>
+                {creators.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Users className="mx-auto w-12 h-12 mb-4 opacity-50" />
+                    <p>Belum ada creators yang terdaftar</p>
+                    <p className="text-sm">Data creators akan muncul setelah ada yang mendaftar di platform</p>
+                  </div>
+                ) : (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>TikTok Username</TableHead>
+                        <TableHead>Email</TableHead>
+                        <TableHead>Phone</TableHead>
+                        <TableHead>eWallet</TableHead>
+                        <TableHead>Referral Code</TableHead>
+                        <TableHead>Video Count</TableHead>
+                        <TableHead>Total Earnings</TableHead>
+                        <TableHead>Join Date</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {creators.map((creator) => (
+                        <TableRow key={creator.id}>
+                          <TableCell className="font-medium">@{creator.tiktok_username}</TableCell>
+                          <TableCell>{creator.email}</TableCell>
+                          <TableCell>{creator.phone}</TableCell>
+                          <TableCell>
+                            <div>
+                              <div className="font-medium">{creator.ewallet_type}</div>
+                              <div className="text-sm text-muted-foreground">{creator.ewallet_number}</div>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline" className="font-mono text-xs">
+                              {creator.referral_code}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <div className="text-center">
+                              <div className="font-medium">{creator.video_count || 0}</div>
+                              <div className="text-xs text-muted-foreground">videos</div>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="font-medium text-green-600">
+                              Rp {parseInt(creator.total_earnings || "0").toLocaleString('id-ID')}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="text-sm">
+                              {new Date(creator.created_at).toLocaleDateString('id-ID')}
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
