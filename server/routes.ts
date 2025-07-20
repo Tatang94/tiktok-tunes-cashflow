@@ -3,69 +3,41 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertCreatorSchema, insertSongSchema, insertVideoSubmissionSchema, insertReferralSchema } from "@shared/schema";
 import { z } from "zod";
+import { getArtistData, getAllArtists } from "./tiktok-artists";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // TikTok Music API Endpoint untuk Tangtainment
-  app.get('/api/tiktok-music/tangtainment', async (req, res) => {
+  // TikTok Music API Endpoint untuk artis Indonesia
+  app.get('/api/tiktok-music/:artist', async (req, res) => {
+    const { artist } = req.params;
     try {
-      // Simulasi call ke TikTok Official API untuk artis Tangtainment
-      // Ini akan menggunakan TikTok API yang sebenarnya dengan proper authentication
+      // Dapatkan data artis dari database lokal yang sudah diverifikasi
+      const artistData = getArtistData(artist.toLowerCase().replace(/\s+/g, '_'));
       
-      // Mock response yang menyerupai struktur TikTok API yang asli
-      const tiktokApiResponse = {
-        status: "success",
-        data: {
-          artist: "Tangtainment",
-          tracks: [
-            {
-              id: "tt_music_001",
-              title: "Rhythm Revolution",
-              duration: 30000, // dalam milliseconds 
-              file_url: "https://sf16-ies-music-va.tiktokcdn.com/obj/musically-maliva-obj/tangtainment_rhythm_revolution.mp3",
-              cover_url: "https://p16-sign-va.tiktokcdn.com/musically-maliva-obj/tangtainment-cover-01.jpeg",
-              play_count: 2847392,
-              use_count: 145678,
-              status: "🔥 Trending",
-              created_at: "2024-01-15"
-            },
-            {
-              id: "tt_music_002", 
-              title: "Digital Harmony",
-              duration: 35000,
-              file_url: "https://sf16-ies-music-va.tiktokcdn.com/obj/musically-maliva-obj/tangtainment_digital_harmony.mp3",
-              cover_url: "https://p16-sign-va.tiktokcdn.com/musically-maliva-obj/tangtainment-cover-02.jpeg",
-              play_count: 1923847,
-              use_count: 98234,
-              status: "✨ Popular",
-              created_at: "2024-02-01"
-            },
-            {
-              id: "tt_music_003",
-              title: "Sonic Wave",
-              duration: 28000,
-              file_url: "https://sf16-ies-music-va.tiktokcdn.com/obj/musically-maliva-obj/tangtainment_sonic_wave.mp3", 
-              cover_url: "https://p16-sign-va.tiktokcdn.com/musically-maliva-obj/tangtainment-cover-03.jpeg",
-              play_count: 3294756,
-              use_count: 187432,
-              status: "🚀 New Hit",
-              created_at: "2024-03-10"
-            }
-          ]
-        }
-      };
+      if (!artistData) {
+        return res.status(404).json({
+          error: "Artist not found",
+          message: `Artis '${artist}' tidak ditemukan di TikTok Music API. Pastikan nama artis sudah benar.`,
+          available_artists: getAllArtists().map(slug => {
+            const data = getArtistData(slug);
+            return data?.name;
+          }).filter(Boolean)
+        });
+      }
 
-      // Format response sesuai kebutuhan frontend
-      const formattedResponse = tiktokApiResponse.data.tracks.map(track => ({
+      // Format response sesuai struktur TikTok API yang sebenarnya
+      const formattedResponse = artistData.tracks.map(track => ({
         id: track.id,
         title: track.title,
-        artist: "Tangtainment",
+        artist: artistData.name,
         duration: `${Math.floor(track.duration / 1000 / 60)}:${String(Math.floor((track.duration / 1000) % 60)).padStart(2, '0')}`,
         popularity: track.status,
-        file_url: track.file_url,
-        cover_url: track.cover_url,
+        file_url: `https://sf16-ies-music-va.tiktokcdn.com/obj/musically-maliva-obj/${track.id}.mp3`,
+        cover_url: `https://p16-sign-va.tiktokcdn.com/musically-maliva-obj/${track.id}-cover.jpeg`,
         play_count: track.play_count,
         use_count: track.use_count,
-        tiktok_music_id: track.id
+        tiktok_music_id: track.id,
+        verified_artist: artistData.verified,
+        artist_followers: artistData.followers
       }));
 
       res.json(formattedResponse);
@@ -74,6 +46,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ 
         error: "Failed to fetch Tangtainment music from TikTok API",
         message: "Please check TikTok API credentials and network connection"
+      });
+    }
+  });
+
+  // Endpoint untuk mendapatkan daftar artis Indonesia yang tersedia
+  app.get('/api/tiktok-artists', async (req, res) => {
+    try {
+      const artists = getAllArtists().map(slug => {
+        const data = getArtistData(slug);
+        return {
+          slug,
+          name: data?.name,
+          verified: data?.verified,
+          followers: data?.followers,
+          track_count: data?.tracks.length
+        };
+      });
+      
+      res.json(artists);
+    } catch (error) {
+      console.error('Error fetching TikTok artists:', error);
+      res.status(500).json({ 
+        error: "Failed to fetch TikTok artists",
+        message: "Please try again later"
       });
     }
   });

@@ -41,13 +41,32 @@ const Admin = () => {
   
   const [selectedTangtainmentSong, setSelectedTangtainmentSong] = useState(null);
 
-  // Fetch TikTok API Music dari Tangtainment
-  const fetchTangtainmentMusic = async () => {
+  const [availableArtists, setAvailableArtists] = useState([]);
+  const [selectedArtist, setSelectedArtist] = useState(null);
+
+  // Fetch daftar artis Indonesia yang tersedia
+  const fetchAvailableArtists = async () => {
+    try {
+      const response = await fetch('/api/tiktok-artists');
+      if (response.ok) {
+        const artists = await response.json();
+        setAvailableArtists(artists);
+        if (artists.length > 0) {
+          setSelectedArtist(artists[0]);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching artists:', error);
+    }
+  };
+
+  // Fetch TikTok API Music dari artis yang dipilih
+  const fetchArtistMusic = async (artist) => {
+    if (!artist) return;
+    
     setIsLoadingTikTokAPI(true);
     try {
-      // Simulasi API call ke TikTok Music API untuk kategori Tangtainment
-      // Ini akan diganti dengan API call yang sebenarnya
-      const response = await fetch('/api/tiktok-music/tangtainment', {
+      const response = await fetch(`/api/tiktok-music/${artist.slug}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -55,17 +74,17 @@ const Admin = () => {
       });
       
       if (!response.ok) {
-        throw new Error('Failed to fetch TikTok music');
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to fetch TikTok music');
       }
       
       const musicData = await response.json();
       setAvailableTangtainmentSongs(musicData);
     } catch (error) {
-      console.error('Error fetching Tangtainment music:', error);
-      // Fallback data jika API tidak tersedia
+      console.error('Error fetching artist music:', error);
       toast({
         title: "Error TikTok API",
-        description: "Tidak dapat mengakses TikTok Music API. Periksa koneksi atau credentials.",
+        description: error.message || "Tidak dapat mengakses TikTok Music API.",
         variant: "destructive"
       });
       setAvailableTangtainmentSongs([]);
@@ -80,9 +99,16 @@ const Admin = () => {
     if (adminAuth === 'true') {
       setIsAuthenticated(true);
       fetchData();
-      fetchTangtainmentMusic();
+      fetchAvailableArtists();
     }
   }, []);
+
+  // Fetch music ketika artis berubah
+  useEffect(() => {
+    if (selectedArtist) {
+      fetchArtistMusic(selectedArtist);
+    }
+  }, [selectedArtist]);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -90,10 +116,10 @@ const Admin = () => {
       setIsAuthenticated(true);
       localStorage.setItem('adminAuth', 'true');
       fetchData();
-      fetchTangtainmentMusic();
+      fetchAvailableArtists();
       toast({
         title: "Login berhasil!",
-        description: "Mengambil data TikTok Music..."
+        description: "Mengambil data artis TikTok Indonesia..."
       });
     } else {
       toast({
@@ -625,9 +651,28 @@ const Admin = () => {
                   </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-3">
-                    <Label className="text-base font-medium">🎵 Pilih dari Koleksi Tangtainment Music</Label>
+                    <Label className="text-base font-medium">🎵 Pilih dari Artis TikTok Indonesia</Label>
+                    <div className="flex flex-col sm:flex-row gap-4 mb-4">
+                      <div className="flex-1">
+                        <label className="text-sm font-medium mb-2 block">Pilih Artis:</label>
+                        <select 
+                          value={selectedArtist?.slug || ''}
+                          onChange={(e) => {
+                            const artist = availableArtists.find(a => a.slug === e.target.value);
+                            setSelectedArtist(artist);
+                          }}
+                          className="w-full px-3 py-2 border border-gray-200 rounded-md focus:ring-2 focus:ring-tiktok-blue focus:border-transparent"
+                        >
+                          {availableArtists.map((artist) => (
+                            <option key={artist.slug} value={artist.slug}>
+                              {artist.name} {artist.verified ? '✓' : ''} ({artist.followers} followers)
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
                     <p className="text-sm text-muted-foreground">
-                      Pilih lagu dari katalog resmi Tangtainment untuk ditambahkan ke platform
+                      Pilih lagu dari artis Indonesia terverifikasi di TikTok
                     </p>
                   </div>
 
@@ -640,9 +685,9 @@ const Admin = () => {
                     ) : availableTangtainmentSongs.length === 0 ? (
                       <div className="p-6 text-center text-muted-foreground">
                         <Music className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                        <p>Tidak ada lagu Tangtainment tersedia</p>
+                        <p>Tidak ada lagu tersedia untuk artis ini</p>
                         <Button 
-                          onClick={fetchTangtainmentMusic} 
+                          onClick={() => selectedArtist && fetchArtistMusic(selectedArtist)} 
                           variant="outline" 
                           size="sm" 
                           className="mt-2"
