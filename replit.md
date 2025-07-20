@@ -46,6 +46,7 @@ Platform untuk creator TikTok yang memungkinkan mereka mendaftar, memilih lagu, 
 - ⚠️ Database table perlu disetup manual di Supabase (lihat SUPABASE_MIGRATION_GUIDE.md)
 - ✅ Migrasi berhasil dari Replit Agent ke environment Replit (Juli 2025)
 - ✅ Navigation footer dibersihkan: menghapus link "Admin Panel" dan "Creator Dashboard"
+- ✅ Vercel deployment diperbaiki: API diubah ke serverless functions dengan @vercel/node
 
 ## Project Architecture
 ### Backend (Node.js + Express)

@@ -3,6 +3,8 @@
 ## Masalah yang Diperbaiki
 ✅ **Masalah**: Deploy Vercel hanya menampilkan teks/kode sumber
 ✅ **Solusi**: Konfigurasi ulang untuk deployment fullstack yang tepat
+✅ **Masalah**: 404 NOT_FOUND error di Vercel
+✅ **Solusi**: API refactored untuk Vercel serverless functions dengan @vercel/node
 
 ## File yang Ditambahkan untuk Vercel:
 
