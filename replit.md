@@ -70,8 +70,10 @@ Platform untuk creator TikTok yang memungkinkan mereka mendaftar, memilih lagu, 
 - ✅ URL musik menggunakan format TikTok CDN (sf16-ies-music-va.tiktokcdn.com)
 - ✅ Sistem diganti dengan artis Indonesia ASLI yang terverifikasi di TikTok (Juli 2025)
 - ✅ Database artis: Pamungkas, Hindia, Stephanie Poetri, Mahalini dengan data akurat
-- ✅ "Tangtainment" dihapus karena tidak ditemukan sebagai artis TikTok yang valid
-- ✅ Admin sekarang dapat memilih dari 4 artis Indonesia populer dengan lagu hits mereka
+- ✅ "Tangtainment" ditambahkan sebagai custom artist berdasarkan YouTube channel user
+- ✅ Admin dapat memilih dari 4 artis terverifikasi + 1 custom artist (Tangtainment)
+- ✅ Custom artist system: YouTube channel UCspPmavWuaHip3jslLURUyQ terintegrasi
+- ✅ Tangtainment memiliki 3 original tracks dengan data play count dan use count
 
 ## Project Architecture
 ### Backend (Node.js + Express)

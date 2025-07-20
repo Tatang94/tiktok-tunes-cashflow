@@ -118,3 +118,50 @@ export function getArtistData(artistSlug: string) {
 export function getAllArtists() {
   return Object.keys(indonesianTikTokArtists);
 }
+
+// Custom artists yang bisa ditambahkan admin
+export const customArtists = {
+  tangtainment: {
+    name: "Tangtainment",
+    verified: false,
+    followers: "Custom",
+    youtube_channel: "UCspPmavWuaHip3jslLURUyQ",
+    tracks: [
+      {
+        id: "tangtainment_001",
+        title: "Original Track 1",
+        duration: 180000, // 3:00
+        play_count: 50000,
+        use_count: 1200,
+        status: "🎵 Original",
+        created_at: "2024-01-01"
+      },
+      {
+        id: "tangtainment_002",
+        title: "Original Track 2", 
+        duration: 210000, // 3:30
+        play_count: 75000,
+        use_count: 2100,
+        status: "🎵 Original",
+        created_at: "2024-02-01"
+      },
+      {
+        id: "tangtainment_003",
+        title: "Original Track 3",
+        duration: 165000, // 2:45
+        play_count: 32000,
+        use_count: 850,
+        status: "🎵 Original",
+        created_at: "2024-03-01"
+      }
+    ]
+  }
+};
+
+export function getCustomArtistData(artistSlug: string) {
+  return customArtists[artistSlug as keyof typeof customArtists];
+}
+
+export function getAllCustomArtists() {
+  return Object.keys(customArtists);
+}

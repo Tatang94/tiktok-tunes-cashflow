@@ -3,24 +3,37 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertCreatorSchema, insertSongSchema, insertVideoSubmissionSchema, insertReferralSchema } from "@shared/schema";
 import { z } from "zod";
-import { getArtistData, getAllArtists } from "./tiktok-artists";
+import { getArtistData, getAllArtists, getCustomArtistData, getAllCustomArtists } from "./tiktok-artists";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // TikTok Music API Endpoint untuk artis Indonesia
   app.get('/api/tiktok-music/:artist', async (req, res) => {
     const { artist } = req.params;
     try {
-      // Dapatkan data artis dari database lokal yang sudah diverifikasi
-      const artistData = getArtistData(artist.toLowerCase().replace(/\s+/g, '_'));
+      // Dapatkan data artis dari database lokal yang sudah diverifikasi atau custom
+      let artistData = getArtistData(artist.toLowerCase().replace(/\s+/g, '_'));
+      
+      // Jika tidak ditemukan di artis verifikasi, cek di custom artists
+      if (!artistData) {
+        artistData = getCustomArtistData(artist.toLowerCase().replace(/\s+/g, '_'));
+      }
       
       if (!artistData) {
+        const verifiedArtists = getAllArtists().map(slug => {
+          const data = getArtistData(slug);
+          return data?.name;
+        }).filter(Boolean);
+        
+        const customArtistsList = getAllCustomArtists().map(slug => {
+          const data = getCustomArtistData(slug);
+          return data?.name;
+        }).filter(Boolean);
+        
         return res.status(404).json({
           error: "Artist not found",
-          message: `Artis '${artist}' tidak ditemukan di TikTok Music API. Pastikan nama artis sudah benar.`,
-          available_artists: getAllArtists().map(slug => {
-            const data = getArtistData(slug);
-            return data?.name;
-          }).filter(Boolean)
+          message: `Artis '${artist}' tidak ditemukan. Pastikan nama artis sudah benar.`,
+          available_verified_artists: verifiedArtists,
+          available_custom_artists: customArtistsList
         });
       }
 
@@ -53,16 +66,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Endpoint untuk mendapatkan daftar artis Indonesia yang tersedia
   app.get('/api/tiktok-artists', async (req, res) => {
     try {
-      const artists = getAllArtists().map(slug => {
+      const verifiedArtists = getAllArtists().map(slug => {
         const data = getArtistData(slug);
         return {
           slug,
           name: data?.name,
           verified: data?.verified,
           followers: data?.followers,
-          track_count: data?.tracks.length
+          track_count: data?.tracks.length,
+          type: 'verified'
         };
       });
+      
+      const customArtistsList = getAllCustomArtists().map(slug => {
+        const data = getCustomArtistData(slug);
+        return {
+          slug,
+          name: data?.name,
+          verified: data?.verified || false,
+          followers: data?.followers,
+          track_count: data?.tracks.length,
+          type: 'custom',
+          youtube_channel: data?.youtube_channel
+        };
+      });
+      
+      const artists = [...verifiedArtists, ...customArtistsList];
       
       res.json(artists);
     } catch (error) {
