@@ -38,6 +38,12 @@ const Admin = () => {
     spotify_url: ""
   });
 
+  // YouTube Music search state
+  const [ytSearchQuery, setYtSearchQuery] = useState("");
+  const [ytSearchResults, setYtSearchResults] = useState<any[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [showYTSearch, setShowYTSearch] = useState(false);
+
   useEffect(() => {
     // Check if already logged in
     const adminAuth = localStorage.getItem('adminAuth');
@@ -114,6 +120,65 @@ const Admin = () => {
     } catch (error) {
       console.error('Error fetching data:', error);
     }
+  };
+
+  // Search YouTube Music
+  const searchYouTubeMusic = async () => {
+    if (!ytSearchQuery.trim()) {
+      toast({
+        title: "Error",
+        description: "Masukkan query pencarian.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsSearching(true);
+    try {
+      const response = await fetch(`/api/ytmusic/search?q=${encodeURIComponent(ytSearchQuery)}&limit=20`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to search YouTube Music');
+      }
+      
+      const data = await response.json();
+      setYtSearchResults(data.tracks || []);
+      
+      toast({
+        title: "Pencarian berhasil",
+        description: `Ditemukan ${data.tracks?.length || 0} lagu.`
+      });
+    } catch (error) {
+      console.error('YouTube Music search error:', error);
+      toast({
+        title: "Error",
+        description: "Gagal mencari lagu di YouTube Music.",
+        variant: "destructive"
+      });
+      setYtSearchResults([]);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  // Select song from YouTube Music results
+  const selectYTTrack = (track: any) => {
+    setSongForm({
+      title: track.title,
+      artist: track.artist,
+      status: "🔥 Trending", // Default status
+      duration: track.duration,
+      earnings_per_video: 100,
+      file_url: track.streamUrl,
+      spotify_url: track.streamUrl // Use YT Music URL as alternative
+    });
+    
+    toast({
+      title: "Lagu dipilih",
+      description: `"${track.title}" oleh ${track.artist} telah dipilih.`
+    });
+    
+    setShowYTSearch(false);
   };
 
   const addSong = async () => {
@@ -490,6 +555,66 @@ const Admin = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
+                  {/* YouTube Music Search Toggle */}
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      variant={showYTSearch ? "default" : "outline"}
+                      onClick={() => setShowYTSearch(!showYTSearch)}
+                      className="flex items-center gap-2"
+                    >
+                      <Music className="w-4 h-4" />
+                      {showYTSearch ? "Manual Input" : "Cari di YouTube Music"}
+                    </Button>
+                  </div>
+
+                  {/* YouTube Music Search */}
+                  {showYTSearch && (
+                    <div className="space-y-4 p-4 bg-muted/50 rounded-lg">
+                      <div className="space-y-2">
+                        <Label>Cari Lagu di YouTube Music</Label>
+                        <div className="flex gap-2">
+                          <Input
+                            value={ytSearchQuery}
+                            onChange={(e) => setYtSearchQuery(e.target.value)}
+                            placeholder="Masukkan nama lagu atau artist..."
+                            onKeyPress={(e) => e.key === 'Enter' && searchYouTubeMusic()}
+                          />
+                          <Button 
+                            onClick={searchYouTubeMusic}
+                            disabled={isSearching}
+                          >
+                            {isSearching ? "Searching..." : "Cari"}
+                          </Button>
+                        </div>
+                      </div>
+
+                      {/* Search Results */}
+                      {ytSearchResults.length > 0 && (
+                        <div className="max-h-60 overflow-y-auto space-y-2">
+                          <Label className="text-sm font-medium">Hasil Pencarian:</Label>
+                          {ytSearchResults.map((track, index) => (
+                            <div 
+                              key={index}
+                              className="flex items-center justify-between p-3 bg-background rounded-lg hover:bg-muted cursor-pointer"
+                              onClick={() => selectYTTrack(track)}
+                            >
+                              <div className="flex-1">
+                                <h4 className="font-medium">{track.title}</h4>
+                                <p className="text-sm text-muted-foreground">
+                                  {track.artist} • {track.duration}
+                                </p>
+                              </div>
+                              <Button size="sm" variant="ghost">
+                                Pilih
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   <div className="space-y-2">
                     <Label htmlFor="title">Judul Lagu</Label>
                     <Input
@@ -555,12 +680,12 @@ const Admin = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="spotify_url">Spotify URL (Optional)</Label>
+                    <Label htmlFor="spotify_url">Music URL (Optional)</Label>
                     <Input
                       id="spotify_url"
                       value={songForm.spotify_url}
                       onChange={(e) => setSongForm({...songForm, spotify_url: e.target.value})}
-                      placeholder="https://open.spotify.com/..."
+                      placeholder="https://music.youtube.com/... atau https://open.spotify.com/..."
                     />
                   </div>
 
