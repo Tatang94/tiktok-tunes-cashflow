@@ -58,6 +58,7 @@ Platform untuk creator TikTok yang memungkinkan mereka mendaftar, memilih lagu, 
 - ✅ SPA routing diperbaiki untuk halaman admin dan routes lainnya di Vercel
 - ✅ Demo data dibersihkan: creator baru mulai dari Rp 0 tanpa earnings palsu
 - ✅ Sample songs data dihapus: lagu akan ditambahkan admin melalui admin panel
+- ✅ Sample data creators dihapus: platform mulai dari nol, creators real akan registrasi melalui homepage
 
 ## Project Architecture
 ### Backend (Node.js + Express)

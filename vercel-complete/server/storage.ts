@@ -70,95 +70,9 @@ export class MemStorage implements IStorage {
   }
 
   private initializeSampleData() {
-    // Add sample creators untuk testing admin panel
-    const sampleCreators = [
-      {
-        id: 1,
-        tiktok_username: "creator_indo1",
-        email: "creator1@example.com",
-        phone: "+62812345678",
-        ewallet_type: "GoPay",
-        ewallet_number: "081234567890",
-        total_earnings: "150000",
-        video_count: 12,
-        referral_code: "REF001",
-        referred_by: null,
-        referral_earnings: "0",
-        created_at: new Date('2024-01-15')
-      },
-      {
-        id: 2,
-        tiktok_username: "tiktoker_pro",
-        email: "tiktoker.pro@gmail.com", 
-        phone: "+62887654321",
-        ewallet_type: "OVO",
-        ewallet_number: "087654321098",
-        total_earnings: "250000",
-        video_count: 18,
-        referral_code: "REF002",
-        referred_by: null,
-        referral_earnings: "0",
-        created_at: new Date('2024-02-10')
-      },
-      {
-        id: 3,
-        tiktok_username: "content_maker",
-        email: "contentmaker.id@yahoo.com",
-        phone: "+62856789123",
-        ewallet_type: "DANA",
-        ewallet_number: "085678912345",
-        total_earnings: "75000",
-        video_count: 5,
-        referral_code: "REF003", 
-        referred_by: null,
-        referral_earnings: "0",
-        created_at: new Date('2024-03-05')
-      }
-    ];
-
-    sampleCreators.forEach(creator => {
-      this.creators.set(creator.id, creator as Creator);
-      if (creator.id >= this.currentCreatorId) {
-        this.currentCreatorId = creator.id + 1;
-      }
-    });
-    
-    console.log('Added', sampleCreators.length, 'sample creators to storage');
-
-    // Add sample songs untuk testing
-    const sampleSongs = [
-      {
-        id: 1,
-        title: "To the Bone",
-        artist: "Pamungkas",
-        status: "🔥 Trending",
-        earnings_per_video: "100",
-        duration: "4:02",
-        file_url: "https://music.youtube.com/watch?v=IR7tYHdYN2Q",
-        spotify_url: "https://music.youtube.com/watch?v=IR7tYHdYN2Q",
-        is_active: true,
-        created_at: new Date()
-      },
-      {
-        id: 2, 
-        title: "Somebody's Pleasure",
-        artist: "Aziz Hedra",
-        status: "✨ Popular",
-        earnings_per_video: "125",
-        duration: "3:45",
-        file_url: "https://music.youtube.com/watch?v=FfyvKLn4SGw",
-        spotify_url: "https://music.youtube.com/watch?v=FfyvKLn4SGw", 
-        is_active: true,
-        created_at: new Date()
-      }
-    ];
-
-    sampleSongs.forEach(song => {
-      this.songs.set(song.id, song as Song);
-      if (song.id >= this.currentSongId) {
-        this.currentSongId = song.id + 1;
-      }
-    });
+    // Start clean - no sample data
+    // Platform dimulai dari nol, data creators dan songs akan ditambah melalui admin panel
+    console.log('Storage initialized clean - no sample data');
   }
 
   // Creator methods
@@ -183,6 +97,7 @@ export class MemStorage implements IStorage {
       video_count: 0,
       referral_code: referralCode,
       referral_earnings: "0",
+      referred_by: insertCreator.referred_by || null,
       created_at: new Date() 
     };
     this.creators.set(id, creator);
@@ -322,6 +237,4 @@ export class MemStorage implements IStorage {
   }
 }
 
-console.log('Creating MemStorage instance...');
 export const storage = new MemStorage();
-console.log('MemStorage instance created');

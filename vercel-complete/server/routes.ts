@@ -9,46 +9,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/creators", async (req, res) => {
     try {
       const creators = await storage.getAllCreators();
-      console.log('Fetched creators:', creators.length);
-      
-      // If empty, create sample data directly
-      if (creators.length === 0) {
-        console.log('No creators found, adding sample data...');
-        
-        const sampleCreators = [
-          {
-            tiktok_username: "creator_indo1",
-            email: "creator1@example.com",
-            phone: "+62812345678",
-            ewallet_type: "GoPay",
-            ewallet_number: "081234567890"
-          },
-          {
-            tiktok_username: "tiktoker_pro",
-            email: "tiktoker.pro@gmail.com",
-            phone: "+62887654321",
-            ewallet_type: "OVO",
-            ewallet_number: "087654321098"
-          },
-          {
-            tiktok_username: "content_maker",
-            email: "contentmaker.id@yahoo.com",
-            phone: "+62856789123",
-            ewallet_type: "DANA",
-            ewallet_number: "085678912345"
-          }
-        ];
-        
-        for (const creatorData of sampleCreators) {
-          await storage.createCreator(creatorData);
-        }
-        
-        const updatedCreators = await storage.getAllCreators();
-        console.log('Added sample creators, total:', updatedCreators.length);
-        res.json(updatedCreators);
-      } else {
-        res.json(creators);
-      }
+      res.json(creators);
     } catch (error) {
       console.error('Error fetching creators:', error);
       res.status(500).json({ error: "Failed to fetch creators" });
